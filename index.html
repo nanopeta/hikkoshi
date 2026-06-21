@@ -630,6 +630,35 @@ function enableReorder(container, dataArrRefIgnored, onCommit){
   container.addEventListener("pointercancel", finish);
 }
 
+/* ====================== snap helper ====================== */
+const SNAP_THRESHOLD = 3; // % of canvas
+
+function snapToEdges(item, others, rawLeft, rawTop){
+  const rR = rawLeft + item.width, rB = rawTop + item.height;
+  let bL = rawLeft, bT = rawTop, mDx = SNAP_THRESHOLD, mDy = SNAP_THRESHOLD;
+
+  const tryX = (delta, result) => { const d = Math.abs(delta); if(d < mDx){ mDx = d; bL = result; } };
+  const tryY = (delta, result) => { const d = Math.abs(delta); if(d < mDy){ mDy = d; bT = result; } };
+
+  // canvas edges
+  tryX(rawLeft,    0);                    tryX(rR - 100, 100 - item.width);
+  tryY(rawTop,     0);                    tryY(rB - 100, 100 - item.height);
+
+  for(const o of others){
+    if(o.id === item.id) continue;
+    const oL = o.left, oR = o.left + o.width, oT = o.top, oB = o.top + o.height;
+    tryX(rawLeft - oR, oR);               tryX(rawLeft - oL, oL);
+    tryX(rR - oL, oL - item.width);       tryX(rR - oR, oR - item.width);
+    tryY(rawTop  - oB, oB);               tryY(rawTop  - oT, oT);
+    tryY(rB - oT, oT - item.height);      tryY(rB - oB, oB - item.height);
+  }
+
+  return {
+    left: clampNum(bL, 0, 100 - item.width),
+    top:  clampNum(bT, 0, 100 - item.height),
+  };
+}
+
 /* ====================== canvas drag (zones + furniture move) ====================== */
 function enableCanvasDrag(){
   const plan = document.getElementById("floor-plan");
@@ -658,13 +687,15 @@ function enableCanvasDrag(){
     const list = drag.kind === "zone" ? state.zones : state.furniture;
     const item = list.find(x=>x.id===drag.id);
     if(!item) return;
-    let leftPct = ((e.clientX - rect.left)/rect.width)*100 - item.width/2;
-    let topPct = ((e.clientY - rect.top)/rect.height)*100 - item.height/2;
-    leftPct = clampNum(leftPct, 0, 100-item.width);
-    topPct = clampNum(topPct, 0, 100-item.height);
+    let rawLeft = ((e.clientX - rect.left)/rect.width)*100 - item.width/2;
+    let rawTop  = ((e.clientY - rect.top)/rect.height)*100 - item.height/2;
+    rawLeft = clampNum(rawLeft, 0, 100 - item.width);
+    rawTop  = clampNum(rawTop,  0, 100 - item.height);
+    const snapItems = drag.kind === "zone" ? state.zones : [...state.zones, ...state.furniture];
+    const { left: leftPct, top: topPct } = snapToEdges(item, snapItems, rawLeft, rawTop);
     drag.el.style.left = leftPct + "%";
-    drag.el.style.top = topPct + "%";
-    drag._live = { top:topPct, left:leftPct };
+    drag.el.style.top  = topPct  + "%";
+    drag._live = { top: topPct, left: leftPct };
   });
 
   const finish = (e) => {
