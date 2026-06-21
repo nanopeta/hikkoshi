@@ -119,6 +119,14 @@
   .data-panel-toggle{ text-align:center; margin-top:18px; }
   .link-btn{ background:none; border:none; color:var(--text-soft); font-size:12px; cursor:pointer; padding:6px; }
   textarea.field{ font-family: ui-monospace, 'SF Mono', Consolas, monospace; font-size:11px; resize:vertical; }
+
+  .info-section{ background:var(--base); border:1px solid var(--line); border-radius:12px; padding:12px; margin-bottom:10px; }
+  .info-section-title{ font-size:11px; font-weight:700; color:var(--accent-deep); letter-spacing:.08em; margin:0 0 10px; }
+  .info-row{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .info-row:last-child{ margin-bottom:0; }
+  .info-label{ font-size:12px; color:var(--text-soft); white-space:nowrap; min-width:84px; }
+  .info-input{ flex:1; min-width:0; font-size:13px; padding:7px 8px; border-radius:8px; border:1px solid var(--line); background:var(--surface); outline:none; color:var(--text); }
+  .info-textarea{ width:100%; font-size:13px; padding:7px 8px; border-radius:8px; border:1px solid var(--line); background:var(--surface); outline:none; color:var(--text); resize:vertical; min-height:72px; margin-top:2px; }
 </style>
 </head>
 <body>
@@ -132,9 +140,18 @@ const COLORS = {
   text:"#2C2F33", textSoft:"#6B7076", danger:"#C16456", warn:"#BD8A45", done:"#7E9A82", line:"#DADDE1",
 };
 
-const STORAGE_KEYS = { tasks:"movehub-tasks-v1", budget:"movehub-budget-v1", furniture:"movehub-furniture-v1", zones:"movehub-zones-v1", planSize:"movehub-plansize-v1" };
+const STORAGE_KEYS = { tasks:"movehub-tasks-v1", budget:"movehub-budget-v1", furniture:"movehub-furniture-v1", zones:"movehub-zones-v1", planSize:"movehub-plansize-v1", info:"movehub-info-v1" };
 
 /* ====================== default data ====================== */
+const DEFAULT_INFO = {
+  address: "", moveInDate: "2026-06-24", floorPlan: "", rent: "", managementFee: "",
+  electricCompany: "", electricNo: "", electricOpenDate: "",
+  gasCompany: "西部ガス", gasPhone: "093-471-7314", gasNo: "", gasOpenDate: "",
+  waterNo: "",
+  internetProvider: "", internetType: "", internetOpenDate: "",
+  agentName: "エイブル小倉店", agentPhone: "", agentPerson: "",
+  memo: "",
+};
 const DEFAULT_TASKS = [
   { id:"t1", title:"ガス開栓予約の電話（093-471-7314）", category:"ライフライン", due:"2026-06-23", done:false },
   { id:"t2", title:"火災保険 付保証明書PDF提出", category:"契約", due:"2026-06-24", done:false },
@@ -199,7 +216,7 @@ const DEFAULT_FURNITURE = [
 const SWATCHES = [COLORS.accent, COLORS.accentDeep, COLORS.beige, COLORS.gray, COLORS.danger, COLORS.done];
 
 /* ====================== state ====================== */
-const state = { tab:"tasks", tasks:[], budget:[], zones:[], furniture:[], layoutEdit:false, dataPanelOpen:false, loaded:false, taskFilter:null, planWidth:5000, planHeight:5000 };
+const state = { tab:"tasks", tasks:[], budget:[], zones:[], furniture:[], info:{}, layoutEdit:false, dataPanelOpen:false, loaded:false, taskFilter:null, planWidth:5000, planHeight:5000 };
 const saveTimers = {};
 
 function showToast(message, opts={}){
@@ -263,6 +280,7 @@ async function loadAll(){
   const planSize = await loadKey(STORAGE_KEYS.planSize, {w:5000, h:5000});
   state.planWidth = planSize.w || 5000;
   state.planHeight = planSize.h || 5000;
+  state.info = await loadKey(STORAGE_KEYS.info, DEFAULT_INFO);
 
   // 初期費用(物件)を1項目にまとめる
   const breakdownIds = ["b15","b16","b17","b18","b19","b20","b21","b22","b23","b24"];
@@ -340,6 +358,7 @@ function renderHeader(){
       <button class="tab-btn ${state.tab==='tasks'?'active':''}" data-action="set-tab" data-tab="tasks">やること</button>
       <button class="tab-btn ${state.tab==='budget'?'active':''}" data-action="set-tab" data-tab="budget">予算</button>
       <button class="tab-btn ${state.tab==='layout'?'active':''}" data-action="set-tab" data-tab="layout">レイアウト</button>
+      <button class="tab-btn ${state.tab==='info'?'active':''}" data-action="set-tab" data-tab="info">基本情報</button>
     </div>
   `;
 }
@@ -442,6 +461,57 @@ function renderBudget(){
     <p class="muted" style="margin:-6px 0 8px;">ハンドル「⠿」を長押しして並び替え</p>
     <div class="list" id="budget-list">${rows}</div>
     <button class="btn btn-primary" data-action="add-budget">+ 項目を追加</button>
+  `;
+}
+
+/* ====================== render: info ====================== */
+function renderInfo(){
+  const v = state.info;
+  const f = (key, type="text", placeholder="") =>
+    `<input class="info-input" type="${type}" data-info-field="${key}" value="${esc(v[key]??'')}" placeholder="${esc(placeholder)}" />`;
+
+  return `
+    <div class="info-section">
+      <p class="info-section-title">物件</p>
+      <div class="info-row"><span class="info-label">住所</span>${f('address','text','北九州市小倉北区…')}</div>
+      <div class="info-row"><span class="info-label">入居日</span>${f('moveInDate','date')}</div>
+      <div class="info-row"><span class="info-label">間取り</span>${f('floorPlan','text','1LDK など')}</div>
+      <div class="info-row"><span class="info-label">家賃</span>${f('rent','text','¥000,000 / 月')}</div>
+      <div class="info-row"><span class="info-label">管理費</span>${f('managementFee','text','¥0,000 / 月')}</div>
+    </div>
+    <div class="info-section">
+      <p class="info-section-title">電気</p>
+      <div class="info-row"><span class="info-label">電力会社</span>${f('electricCompany','text','九州電力 など')}</div>
+      <div class="info-row"><span class="info-label">お客様番号</span>${f('electricNo','text')}</div>
+      <div class="info-row"><span class="info-label">開通日</span>${f('electricOpenDate','date')}</div>
+    </div>
+    <div class="info-section">
+      <p class="info-section-title">ガス</p>
+      <div class="info-row"><span class="info-label">ガス会社</span>${f('gasCompany','text','西部ガス など')}</div>
+      <div class="info-row"><span class="info-label">電話番号</span>${f('gasPhone','tel')}</div>
+      <div class="info-row"><span class="info-label">お客様番号</span>${f('gasNo','text')}</div>
+      <div class="info-row"><span class="info-label">開栓日</span>${f('gasOpenDate','date')}</div>
+    </div>
+    <div class="info-section">
+      <p class="info-section-title">水道</p>
+      <div class="info-row"><span class="info-label">お客様番号</span>${f('waterNo','text')}</div>
+    </div>
+    <div class="info-section">
+      <p class="info-section-title">インターネット</p>
+      <div class="info-row"><span class="info-label">プロバイダ</span>${f('internetProvider','text','NURO / ドコモ光 など')}</div>
+      <div class="info-row"><span class="info-label">種別</span>${f('internetType','text','光ファイバー など')}</div>
+      <div class="info-row"><span class="info-label">開通予定日</span>${f('internetOpenDate','date')}</div>
+    </div>
+    <div class="info-section">
+      <p class="info-section-title">不動産・管理会社</p>
+      <div class="info-row"><span class="info-label">会社名</span>${f('agentName','text')}</div>
+      <div class="info-row"><span class="info-label">電話番号</span>${f('agentPhone','tel')}</div>
+      <div class="info-row"><span class="info-label">担当者</span>${f('agentPerson','text')}</div>
+    </div>
+    <div class="info-section">
+      <p class="info-section-title">メモ</p>
+      <textarea class="info-textarea" data-info-field="memo" placeholder="その他の覚え書き…">${esc(v.memo??'')}</textarea>
+    </div>
   `;
 }
 
@@ -581,6 +651,7 @@ function render(){
   let body = "";
   if(state.tab === "tasks") body = renderTasks();
   else if(state.tab === "budget") body = renderBudget();
+  else if(state.tab === "info") body = renderInfo();
   else body = renderLayout();
   app.innerHTML = renderHeader() + body + renderDataPanel();
   if(state.tab === "tasks") enableReorder(document.getElementById("task-list"), state.tasks, (ids)=>{
@@ -816,6 +887,11 @@ document.addEventListener("change", (e) => {
 document.addEventListener("input", (e) => {
   const t = e.target;
   if(!t.dataset) return;
+  if(t.dataset.infoField !== undefined){
+    state.info[t.dataset.infoField] = t.value;
+    debSave(STORAGE_KEYS.info, state.info);
+    return;
+  }
   const id = t.dataset.id, field = t.dataset.field, kind = t.dataset.kind;
   if(!field || !id) return;
 
