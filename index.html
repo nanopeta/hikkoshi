@@ -81,6 +81,7 @@
 
   .layout-note{ display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:5px; }
   .edit-toggle{ font-size:11px; padding:4px 8px; border-radius:7px; border:none; cursor:pointer; font-weight:600; white-space:nowrap; }
+  .fp-sticky{ position:sticky; top:0; z-index:50; background:var(--base); padding-bottom:6px; }
   .fp-wrap{ display:flex; align-items:stretch; gap:3px; }
   .fp-side-label{ font-size:9px; color:var(--text-soft); display:flex; align-items:center; writing-mode:vertical-rl; line-height:1.2; padding:2px 0; }
   .fp-side-label.fp-left{ transform:rotate(180deg); }
@@ -147,7 +148,7 @@ const COLORS = {
   text:"#2C2F33", textSoft:"#6B7076", danger:"#C16456", warn:"#BD8A45", done:"#7E9A82", line:"#DADDE1",
 };
 
-const STORAGE_KEYS = { tasks:"movehub-tasks-v1", budget:"movehub-budget-v1", furniture:"movehub-furniture-v1", zones:"movehub-zones-v1", planSize:"movehub-plansize-v1", info:"movehub-info-v1", planLabels:"movehub-planlabels-v1" };
+const STORAGE_KEYS = { tasks:"movehub-tasks-v1", budget:"movehub-budget-v1", furniture:"movehub-furniture-v1", zones:"movehub-zones-v1", planSize:"movehub-plansize-v1", info:"movehub-info-v1", planLabels:"movehub-planlabels-v1", layoutDefault:"movehub-layout-default-v1" };
 
 /* ====================== default data ====================== */
 const DEFAULT_INFO = {
@@ -585,6 +586,11 @@ function renderLayout(){
           <label>奥行き mm<input class="grid4 input" type="number" id="plan-h" value="${state.planHeight}" /></label>
         </div>
         <button class="btn btn-ghost" data-action="apply-plan-size">実寸を適用</button>
+      </div>
+      <div class="edit-section">
+        <p class="edit-section-title">初期レイアウト</p>
+        <button class="btn btn-ghost" data-action="save-layout-default" style="margin-bottom:6px;">現在のレイアウトを初期値として保存</button>
+        <button class="btn btn-ghost" style="color:var(--danger);border:1px solid var(--line);" data-action="reset-layout">初期レイアウトに戻す</button>
       </div>` : "";
 
     const zoneCards = state.zones.map(z => `
@@ -655,7 +661,7 @@ function renderLayout(){
     ${state.furniture.map(f=>`<div class="legend-item"><span class="legend-dot" style="background:${f.color};"></span><span>${esc(f.label)}</span></div>`).join("")}
   </div>`;
 
-  return `
+  const fpArea = `
     <div class="layout-note">
       <span class="muted">家具はいつでもドラッグ可能</span>
       <button class="edit-toggle" style="${editBtnStyle}" data-action="toggle-edit">${state.layoutEdit?'編集を終える':'間取りを編集'}</button>
@@ -671,11 +677,11 @@ function renderLayout(){
         <span class="fp-edge-label" data-edge="bottom">${esc(state.planLabels.bottom)}</span>
       </div>
       <span class="fp-side-label" data-edge="right">${esc(state.planLabels.right)}</span>
-    </div>
-    ${legend}
-    ${editPanels}
-    <button class="btn btn-ghost reset-btn" data-action="reset-layout">初期レイアウトに戻す</button>
-  `;
+    </div>`;
+
+  return state.layoutEdit
+    ? `<div class="fp-sticky">${fpArea}</div>${legend}${editPanels}`
+    : `${fpArea}${legend}`;
 }
 
 /* ====================== export / import ====================== */
@@ -883,7 +889,17 @@ document.addEventListener("click", (e) => {
 
   else if(action === "toggle-edit"){ state.layoutEdit = !state.layoutEdit; render(); }
   else if(action === "set-layout-edit-tab"){ state.layoutEditTab = btn.dataset.tab; render(); }
-  else if(action === "reset-layout"){ state.zones = JSON.parse(JSON.stringify(DEFAULT_ZONES)); state.furniture = JSON.parse(JSON.stringify(DEFAULT_FURNITURE)); saveNow(STORAGE_KEYS.zones, state.zones); saveNow(STORAGE_KEYS.furniture, state.furniture); render(); }
+  else if(action === "save-layout-default"){
+    localStorage.setItem(STORAGE_KEYS.layoutDefault, JSON.stringify({ zones: state.zones, furniture: state.furniture }));
+    showToast("現在のレイアウトを初期値として保存しました", { autoHideMs:2000 });
+  }
+  else if(action === "reset-layout"){
+    let def = null;
+    try{ def = JSON.parse(localStorage.getItem(STORAGE_KEYS.layoutDefault)); }catch(_){}
+    state.zones = JSON.parse(JSON.stringify(def?.zones || DEFAULT_ZONES));
+    state.furniture = JSON.parse(JSON.stringify(def?.furniture || DEFAULT_FURNITURE));
+    saveNow(STORAGE_KEYS.zones, state.zones); saveNow(STORAGE_KEYS.furniture, state.furniture); render();
+  }
   else if(action === "delete-zone"){ state.zones = state.zones.filter(z=>z.id!==id); saveNow(STORAGE_KEYS.zones, state.zones); render(); }
   else if(action === "add-zone"){
     state.zones.push({ id:uid("z"), label:"新しい部屋", top:30, left:30, width:20, height:15, fill:COLORS.surface, z:0 });
