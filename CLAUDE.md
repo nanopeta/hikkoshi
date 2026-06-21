@@ -21,13 +21,14 @@ CLAUDE.md        # このファイル（開発ガイド）
 ```
 
 ## 開発方法
-```
-# ビルド不要。ブラウザで直接開く
-open index.html
 
-# または Python簡易サーバー（localStorage確認のため推奨）
+**スマホ（メイン）**: Claude Code Web でコードを編集 → PR マージ → GitHub Pages で確認。
+
+```
+# ローカルPC がある場合のみ（ localStorage 動作確認用）
 python3 -m http.server 8080
 ```
+
 `index.html` を直接編集して保存 → ブラウザリロードで確認。
 
 ## アーキテクチャ
