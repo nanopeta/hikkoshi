@@ -20,114 +20,120 @@
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html,body{ margin:0; padding:0; }
   body{ background:var(--surface); font-family:'Hiragino Sans','Hiragino Kaku Gothic ProN','Noto Sans JP',system-ui,sans-serif; color:var(--text); }
-  #app{ max-width:480px; margin:0 auto; padding:16px 16px 40px; }
+  #app{ max-width:480px; margin:0 auto; padding:10px 12px 32px; }
 
-  header.app-header{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  header.app-header{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
   .eyebrow{ font-size:10px; letter-spacing:.14em; color:var(--accent-deep); margin:0; }
-  h1{ font-size:18px; font-weight:700; margin:2px 0 0; }
+  h1{ font-size:17px; font-weight:700; margin:2px 0 0; }
 
-  .next-due{ background:var(--accent-deep); color:#fff; border-radius:12px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:14px; font-size:12px; }
+  .next-due{ background:var(--accent-deep); color:#fff; border-radius:10px; padding:8px 10px; display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px; font-size:11px; }
   .next-due b{ font-weight:700; white-space:nowrap; }
 
-  .tabs{ display:flex; gap:6px; margin-bottom:14px; }
-  .tab-btn{ flex:1; padding:9px 4px; border-radius:10px; border:1px solid var(--line); background:var(--base); color:var(--text-soft); font-size:13px; font-weight:600; cursor:pointer; }
+  .tabs{ display:flex; gap:5px; margin-bottom:10px; }
+  .tab-btn{ flex:1; padding:7px 3px; border-radius:9px; border:1px solid var(--line); background:var(--base); color:var(--text-soft); font-size:12px; font-weight:600; cursor:pointer; }
   .tab-btn.active{ background:var(--accent); color:#fff; border-color:var(--accent); }
 
-  .muted{ color:var(--text-soft); font-size:12px; }
+  .muted{ color:var(--text-soft); font-size:11px; }
   .small{ font-size:11px; }
 
-  .toprow{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .toprow{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
   .check-inline{ display:flex; align-items:center; gap:4px; font-size:11px; color:var(--text-soft); }
 
-  .list{ display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
-  .list-row{ display:flex; align-items:flex-start; gap:8px; background:var(--base); border:1px solid var(--line); border-radius:12px; padding:8px; }
+  .list{ display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
+  .list-row{ display:flex; align-items:flex-start; gap:6px; background:var(--base); border:1px solid var(--line); border-radius:10px; padding:7px; }
   .list-row.done-row{ background:#F5F6F7; }
   .list-row.dragging{ opacity:.55; box-shadow:0 4px 10px rgba(0,0,0,.12); }
   .reorder-handle{ touch-action:none; cursor:grab; color:var(--gray); font-size:16px; padding:2px 4px; line-height:1; user-select:none; }
-  .furn-rotate-btn{ position:absolute; bottom:2px; right:2px; width:18px; height:18px; border-radius:50%; border:none; background:rgba(0,0,0,.3); color:#fff; font-size:11px; cursor:pointer; padding:0; line-height:18px; z-index:20; text-align:center; }
+  .furn-rotate-btn{ position:absolute; bottom:2px; right:2px; width:16px; height:16px; border-radius:50%; border:none; background:rgba(0,0,0,.3); color:#fff; font-size:10px; cursor:pointer; padding:0; line-height:16px; z-index:20; text-align:center; }
   .row-main{ flex:1; min-width:0; }
-  .task-title{ font-size:14px; margin:0; }
+  .task-title{ font-size:13px; margin:0; }
   .task-title.done{ color:var(--text-soft); text-decoration:line-through; }
-  .chips{ display:flex; gap:5px; margin-top:6px; flex-wrap:wrap; }
-  .chip{ font-size:11px; padding:2px 6px; border-radius:6px; background:var(--surface); color:var(--text-soft); white-space:nowrap; }
-  .del-btn{ border:none; background:none; color:var(--gray); font-size:13px; cursor:pointer; padding:2px 4px; }
-  input[type=checkbox]{ width:16px; height:16px; accent-color:var(--accent); margin-top:2px; }
+  .chips{ display:flex; gap:4px; margin-top:4px; flex-wrap:wrap; }
+  .chip{ font-size:10px; padding:2px 5px; border-radius:5px; background:var(--surface); color:var(--text-soft); white-space:nowrap; }
+  .del-btn{ border:none; background:none; color:var(--gray); font-size:12px; cursor:pointer; padding:2px 3px; }
+  input[type=checkbox]{ width:15px; height:15px; accent-color:var(--accent); margin-top:2px; }
 
-  .panel{ background:var(--surface); border-radius:12px; padding:12px; }
-  .panel-title{ font-size:12px; font-weight:600; color:var(--accent-deep); margin:0 0 8px; }
-  .field{ width:100%; font-size:14px; padding:8px; border-radius:10px; border:1px solid var(--line); background:var(--base); outline:none; color:var(--text); margin-bottom:8px; }
-  .field-row{ display:flex; gap:8px; }
+  .panel{ background:var(--surface); border-radius:10px; padding:10px; }
+  .panel-title{ font-size:11px; font-weight:600; color:var(--accent-deep); margin:0 0 6px; }
+  .field{ width:100%; font-size:13px; padding:6px 8px; border-radius:8px; border:1px solid var(--line); background:var(--base); outline:none; color:var(--text); margin-bottom:6px; }
+  .field-row{ display:flex; gap:6px; }
   .field-row .field{ margin-bottom:0; }
-  .btn{ display:block; width:100%; text-align:center; font-size:14px; font-weight:600; padding:10px; border-radius:10px; border:none; cursor:pointer; }
+  .btn{ display:block; width:100%; text-align:center; font-size:13px; font-weight:600; padding:9px; border-radius:9px; border:none; cursor:pointer; }
   .btn-primary{ background:var(--accent); color:#fff; }
   .btn-ghost{ background:var(--surface-deep); color:var(--accent-deep); }
 
-  .budget-summary{ background:var(--surface-deep); border-radius:12px; padding:12px; margin-bottom:14px; }
-  .summary-row{ display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px; }
+  .budget-summary{ background:var(--surface-deep); border-radius:10px; padding:10px; margin-bottom:10px; }
+  .summary-row{ display:flex; justify-content:space-between; font-size:12px; margin-bottom:3px; }
   .summary-row:last-child{ margin-bottom:0; }
   .summary-row .val{ font-weight:700; }
 
-  .b-card{ background:var(--base); border:1px solid var(--line); border-radius:12px; padding:10px; }
+  .b-card{ background:var(--base); border:1px solid var(--line); border-radius:10px; padding:8px; }
   .b-card .cat-input{ font-size:11px; color:var(--text-soft); border:none; background:transparent; padding:0; width:100%; outline:none; }
-  .b-card .item-input{ font-size:14px; font-weight:600; border:none; background:transparent; padding:0; width:100%; outline:none; color:var(--text); }
-  .b-row2{ display:flex; align-items:center; gap:6px; margin-top:8px; flex-wrap:wrap; font-size:12px; color:var(--text-soft); }
-  .num-sm{ width:78px; padding:6px 7px; border-radius:8px; border:1px solid var(--line); font-size:13px; outline:none; }
-  .badge{ font-size:11px; padding:2px 7px; border-radius:7px; color:#fff; white-space:nowrap; }
-  .b-row3{ display:flex; gap:8px; margin-top:8px; }
+  .b-card .item-input{ font-size:13px; font-weight:600; border:none; background:transparent; padding:0; width:100%; outline:none; color:var(--text); }
+  .b-row2{ display:flex; align-items:center; gap:5px; margin-top:6px; flex-wrap:wrap; font-size:11px; color:var(--text-soft); }
+  .num-sm{ width:70px; padding:5px 6px; border-radius:7px; border:1px solid var(--line); font-size:12px; outline:none; }
+  .badge{ font-size:10px; padding:2px 6px; border-radius:6px; color:#fff; white-space:nowrap; }
+  .b-row3{ display:flex; gap:6px; margin-top:6px; }
   .b-row3 .num-sm{ flex:1; width:auto; }
   select.field, select.num-sm{ -webkit-appearance:none; }
 
-  .layout-note{ display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px; }
-  .edit-toggle{ font-size:11px; padding:5px 9px; border-radius:8px; border:none; cursor:pointer; font-weight:600; white-space:nowrap; }
-  .compass{ display:flex; justify-content:space-between; font-size:11px; color:var(--text-soft); padding:0 4px; margin-bottom:4px; }
-  .floor-plan{ position:relative; width:100%; padding-top:100%; border:1px solid var(--line); border-radius:12px; background:var(--base); overflow:hidden; touch-action:none; user-select:none; }
+  .layout-note{ display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:5px; }
+  .edit-toggle{ font-size:11px; padding:4px 8px; border-radius:7px; border:none; cursor:pointer; font-weight:600; white-space:nowrap; }
+  .compass{ display:flex; justify-content:space-between; font-size:10px; color:var(--text-soft); padding:0 3px; margin-bottom:3px; }
+  .floor-plan{ position:relative; width:100%; padding-top:100%; border:1px solid var(--line); border-radius:10px; background:var(--base); overflow:hidden; touch-action:none; user-select:none; }
   .zone-box, .furniture-box{ position:absolute; }
-  .zone-box{ display:flex; align-items:center; justify-content:center; padding:4px; border:1px solid var(--line); }
+  .zone-box{ display:flex; align-items:center; justify-content:center; padding:3px; border:1px solid var(--line); }
   .zone-box.editable{ border-color:var(--accent); cursor:grab; }
   .zone-label{ font-size:9px; line-height:1.3; color:var(--text-soft); text-align:center; word-break:break-all; }
   .furniture-box{ display:flex; align-items:center; justify-content:center; text-align:center; border-radius:6px; box-shadow:0 2px 4px rgba(0,0,0,.15); cursor:grab; z-index:10; }
-  .furniture-box span{ font-size:10px; color:#fff; padding:0 2px; line-height:1.2; }
-  .edge-label{ position:absolute; font-size:10px; color:var(--text-soft); }
+  .furniture-box span{ font-size:9px; color:#fff; padding:0 2px; line-height:1.2; text-shadow:0 1px 2px rgba(0,0,0,.7); }
+  .edge-label{ position:absolute; font-size:9px; color:var(--text-soft); }
+  .furn-front{ position:absolute; pointer-events:none; z-index:15; }
+  .furn-front-none{ display:none; }
+  .furn-front-top{ top:0; left:0; right:0; height:3px; background:rgba(255,255,255,.8); border-radius:3px 3px 0 0; }
+  .furn-front-bottom{ bottom:0; left:0; right:0; height:3px; background:rgba(255,255,255,.8); border-radius:0 0 3px 3px; }
+  .furn-front-left{ top:0; bottom:0; left:0; width:3px; background:rgba(255,255,255,.8); border-radius:3px 0 0 3px; }
+  .furn-front-right{ top:0; bottom:0; right:0; width:3px; background:rgba(255,255,255,.8); border-radius:0 3px 3px 0; }
 
-  .edit-section{ margin-top:14px; }
-  .edit-section-title{ font-size:12px; font-weight:600; color:var(--accent-deep); margin:0 0 8px; }
-  .edit-card{ background:var(--surface); border-radius:12px; padding:10px; margin-bottom:8px; }
-  .edit-card .row-top{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
-  .grid4{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; font-size:11px; color:var(--text-soft); }
+  .edit-section{ margin-top:10px; }
+  .edit-section-title{ font-size:11px; font-weight:600; color:var(--accent-deep); margin:0 0 6px; }
+  .edit-card{ background:var(--surface); border-radius:10px; padding:8px; margin-bottom:6px; }
+  .edit-card .row-top{ display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+  .grid4{ display:grid; grid-template-columns:repeat(4,1fr); gap:5px; font-size:10px; color:var(--text-soft); }
   .grid4 label{ display:flex; flex-direction:column; gap:2px; }
-  .grid4 input{ padding:5px; border-radius:6px; border:1px solid var(--line); font-size:12px; color:var(--text); background:var(--base); width:100%; min-width:0; }
-  .swatches{ display:flex; gap:6px; margin-top:8px; }
-  .swatch{ width:22px; height:22px; border-radius:6px; border:2px solid transparent; cursor:pointer; }
+  .grid4 input{ padding:4px; border-radius:5px; border:1px solid var(--line); font-size:11px; color:var(--text); background:var(--base); width:100%; min-width:0; }
+  .swatches{ display:flex; gap:5px; margin-top:6px; flex-wrap:wrap; }
+  .swatch{ width:20px; height:20px; border-radius:5px; border:2px solid transparent; cursor:pointer; }
   .swatch.selected{ border-color:var(--text); }
-  .reset-btn{ margin-top:12px; }
+  .reset-btn{ margin-top:10px; }
   .loading{ text-align:center; padding:40px 0; color:var(--text-soft); font-size:13px; }
 
-  .progress-wrap{ height:4px; background:var(--surface-deep); border-radius:2px; margin-bottom:12px; overflow:hidden; }
+  .progress-wrap{ height:3px; background:var(--surface-deep); border-radius:2px; margin-bottom:10px; overflow:hidden; }
   .progress-fill{ height:100%; background:var(--done); border-radius:2px; transition:width .3s ease; }
 
-  .filter-chips{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
-  .filter-chip{ font-size:11px; padding:4px 10px; border-radius:20px; border:1px solid var(--line); background:var(--base); color:var(--text-soft); cursor:pointer; white-space:nowrap; font-weight:500; }
+  .filter-chips{ display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px; }
+  .filter-chip{ font-size:10px; padding:3px 8px; border-radius:16px; border:1px solid var(--line); background:var(--base); color:var(--text-soft); cursor:pointer; white-space:nowrap; font-weight:500; }
   .filter-chip.active{ background:var(--accent-deep); color:#fff; border-color:var(--accent-deep); }
 
-  .furniture-legend{ display:flex; flex-wrap:wrap; gap:8px 14px; margin-top:10px; padding:10px 12px; background:var(--surface); border-radius:10px; }
-  .legend-item{ display:flex; align-items:center; gap:5px; font-size:11px; color:var(--text-soft); }
-  .legend-dot{ width:10px; height:10px; border-radius:3px; flex-shrink:0; }
+  .furniture-legend{ display:flex; flex-wrap:wrap; gap:6px 12px; margin-top:8px; padding:8px 10px; background:var(--surface); border-radius:9px; }
+  .legend-item{ display:flex; align-items:center; gap:4px; font-size:10px; color:var(--text-soft); }
+  .legend-dot{ width:9px; height:9px; border-radius:3px; flex-shrink:0; }
 
-  .save-toast{ position:fixed; left:50%; bottom:18px; transform:translateX(-50%) translateY(16px); background:var(--text); color:#fff; padding:10px 14px; border-radius:12px; font-size:12px; display:flex; align-items:center; gap:10px; opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease; max-width:88%; z-index:1000; box-shadow:0 6px 16px rgba(0,0,0,.25); }
+  .save-toast{ position:fixed; left:50%; bottom:16px; transform:translateX(-50%) translateY(16px); background:var(--text); color:#fff; padding:9px 12px; border-radius:10px; font-size:12px; display:flex; align-items:center; gap:8px; opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease; max-width:88%; z-index:1000; box-shadow:0 6px 16px rgba(0,0,0,.25); }
   .save-toast.show{ opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto; }
-  .save-toast button{ background:var(--accent); color:#fff; border:none; padding:6px 10px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap; flex-shrink:0; }
+  .save-toast button{ background:var(--accent); color:#fff; border:none; padding:5px 9px; border-radius:7px; font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap; flex-shrink:0; }
 
-  .data-panel-toggle{ text-align:center; margin-top:18px; }
-  .link-btn{ background:none; border:none; color:var(--text-soft); font-size:12px; cursor:pointer; padding:6px; }
+  .data-panel-toggle{ text-align:center; margin-top:14px; }
+  .link-btn{ background:none; border:none; color:var(--text-soft); font-size:11px; cursor:pointer; padding:5px; }
   textarea.field{ font-family: ui-monospace, 'SF Mono', Consolas, monospace; font-size:11px; resize:vertical; }
 
-  .info-section{ background:var(--base); border:1px solid var(--line); border-radius:12px; padding:12px; margin-bottom:10px; }
-  .info-section-title{ font-size:11px; font-weight:700; color:var(--accent-deep); letter-spacing:.08em; margin:0 0 10px; }
-  .info-row{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .info-section{ background:var(--base); border:1px solid var(--line); border-radius:10px; padding:10px; margin-bottom:8px; }
+  .info-section-title{ font-size:10px; font-weight:700; color:var(--accent-deep); letter-spacing:.08em; margin:0 0 8px; }
+  .info-row{ display:flex; align-items:center; gap:6px; margin-bottom:6px; }
   .info-row:last-child{ margin-bottom:0; }
-  .info-label{ font-size:12px; color:var(--text-soft); white-space:nowrap; min-width:84px; }
-  .info-input{ flex:1; min-width:0; font-size:13px; padding:7px 8px; border-radius:8px; border:1px solid var(--line); background:var(--surface); outline:none; color:var(--text); }
-  .info-textarea{ width:100%; font-size:13px; padding:7px 8px; border-radius:8px; border:1px solid var(--line); background:var(--surface); outline:none; color:var(--text); resize:vertical; min-height:72px; margin-top:2px; }
+  .info-label{ font-size:11px; color:var(--text-soft); white-space:nowrap; min-width:76px; }
+  .info-input{ flex:1; min-width:0; font-size:12px; padding:5px 7px; border-radius:7px; border:1px solid var(--line); background:var(--surface); outline:none; color:var(--text); }
+  .info-textarea{ width:100%; font-size:12px; padding:5px 7px; border-radius:7px; border:1px solid var(--line); background:var(--surface); outline:none; color:var(--text); resize:vertical; min-height:60px; margin-top:2px; }
 </style>
 </head>
 <body>
@@ -141,17 +147,17 @@ const COLORS = {
   text:"#2C2F33", textSoft:"#6B7076", danger:"#C16456", warn:"#BD8A45", done:"#7E9A82", line:"#DADDE1",
 };
 
-const STORAGE_KEYS = { tasks:"movehub-tasks-v1", budget:"movehub-budget-v1", furniture:"movehub-furniture-v1", zones:"movehub-zones-v1", planSize:"movehub-plansize-v1", info:"movehub-info-v1" };
+const STORAGE_KEYS = { tasks:"movehub-tasks-v1", budget:"movehub-budget-v1", furniture:"movehub-furniture-v1", zones:"movehub-zones-v1", planSize:"movehub-plansize-v1", info:"movehub-info-v1", planLabels:"movehub-planlabels-v1" };
 
 /* ====================== default data ====================== */
 const DEFAULT_INFO = {
   address: "", moveInDate: "2026-06-24", floorPlan: "", rent: "", managementFee: "",
   monthlyInsurance: "", monthlySupport: "",
-  electricCompany: "", electricNo: "", electricOpenDate: "",
-  gasCompany: "西部ガス", gasPhone: "093-471-7314", gasNo: "", gasOpenDate: "",
-  waterCompany: "", waterPhone: "", waterNo: "",
-  internetProvider: "", internetType: "", internetOpenDate: "",
-  agentName: "", agentPhone: "", agentPerson: "",
+  electricCompany: "", electricPhone: "", electricNo: "", electricOpenDate: "", electricUrl: "",
+  gasCompany: "西部ガス", gasPhone: "093-471-7314", gasNo: "", gasOpenDate: "", gasUrl: "",
+  waterCompany: "", waterPhone: "", waterNo: "", waterOpenDate: "", waterUrl: "",
+  internetProvider: "", internetType: "", internetOpenDate: "", internetUrl: "",
+  agentName: "", agentPhone: "", agentPerson: "", agentUrl: "",
   memo: "",
 };
 const DEFAULT_TASKS = [
@@ -208,18 +214,19 @@ const DEFAULT_ZONES = [
 ];
 
 const DEFAULT_FURNITURE = [
-  { id:"f1", label:"ベッド",               top:46, left:11, width:34, height:11, color:COLORS.accent,    rotate:0, shape:"rect" },
-  { id:"f2", label:"デスク(FlexiSpot)",    top:6,  left:12, width:19, height:9,  color:COLORS.beige,     rotate:0, shape:"rect" },
-  { id:"f3", label:"モニター",             top:5,  left:32, width:7,  height:6,  color:COLORS.gray,      rotate:0, shape:"rect" },
-  { id:"f4", label:"ローテーブル",         top:70, left:38, width:17, height:9,  color:COLORS.beige,     rotate:0, shape:"rect" },
-  { id:"f5", label:"プロジェクター画面(東壁)", top:96, left:32, width:30, height:4,  color:COLORS.accentDeep, rotate:0, shape:"rect" },
+  { id:"f1", label:"ベッド",               top:46, left:11, width:34, height:11, color:"#C0C8D0", rotate:0, shape:"rect", front:"none" },
+  { id:"f2", label:"デスク(FlexiSpot)",    top:6,  left:12, width:19, height:9,  color:"#2C2C2C", rotate:0, shape:"rect", front:"none" },
+  { id:"f3", label:"モニター",             top:5,  left:32, width:7,  height:6,  color:"#1A1A1A", rotate:0, shape:"rect", front:"none" },
+  { id:"f4", label:"ローテーブル",         top:70, left:38, width:17, height:9,  color:"#EEEAE6", rotate:0, shape:"rect", front:"none" },
+  { id:"f5", label:"プロジェクター画面(東壁)", top:96, left:32, width:30, height:4, color:"#D8D8D8", rotate:0, shape:"rect", front:"none" },
 ];
 
-const SWATCHES = [COLORS.accent, COLORS.accentDeep, COLORS.beige, COLORS.gray, COLORS.danger, COLORS.done];
+const SWATCHES = ["#1A1A1A","#404040","#909090","#C8C8C8","#F2F2F2","#7B5B3A","#C49A6C","#E8D5B0","#71889F","#54677A"];
 const ZONE_SWATCHES = ["#EEF0F2","#E2E5E9","#E6DFD2","#E7CFC9","#DCE7DC","#F0E8D0","#E8D5B0","#D4C5A9","#E0D4E8","#D0E4E0"];
+const DEFAULT_PLAN_LABELS = {top:"西",right:"北（入口）",bottom:"東",left:"南（バルコニー）"};
 
 /* ====================== state ====================== */
-const state = { tab:"tasks", tasks:[], budget:[], zones:[], furniture:[], info:{}, layoutEdit:false, dataPanelOpen:false, loaded:false, taskFilter:null, budgetFilter:null, planWidth:5000, planHeight:5000 };
+const state = { tab:"tasks", tasks:[], budget:[], zones:[], furniture:[], info:{}, layoutEdit:false, dataPanelOpen:false, loaded:false, taskFilter:null, budgetFilter:null, planWidth:5000, planHeight:5000, planLabels:{top:"西",right:"北（入口）",bottom:"東",left:"南（バルコニー）"} };
 const saveTimers = {};
 
 function showToast(message, opts={}){
@@ -284,6 +291,7 @@ async function loadAll(){
   state.planWidth = planSize.w || 5000;
   state.planHeight = planSize.h || 5000;
   state.info = await loadKey(STORAGE_KEYS.info, DEFAULT_INFO);
+  state.planLabels = await loadKey(STORAGE_KEYS.planLabels, DEFAULT_PLAN_LABELS);
 
   // 初期費用(物件)を1項目にまとめる
   const breakdownIds = ["b15","b16","b17","b18","b19","b20","b21","b22","b23","b24"];
@@ -410,7 +418,7 @@ function renderTasks(){
     <div class="panel">
       <p class="panel-title">タスクを追加</p>
       <input class="field" id="new-task-title" placeholder="やること" />
-      <div class="field-row" style="margin-bottom:8px;">
+      <div class="field-row" style="margin-bottom:6px;">
         <select class="field" id="new-task-category">
           ${TASK_CATEGORIES.map(c=>`<option>${c}</option>`).join("")}
         </select>
@@ -423,7 +431,6 @@ function renderTasks(){
 
 /* ====================== render: budget ====================== */
 function renderBudget(){
-  const totalMin = state.budget.reduce((s,b)=>s+(Number(b.min)||0),0);
   const totalMax = state.budget.reduce((s,b)=>s+(Number(b.max)||0),0);
   const totalActual = state.budget.reduce((s,b)=>s+(Number(b.actual)||0),0);
   const actualCount = state.budget.filter(b=>b.actual!=null && b.actual!=="").length;
@@ -438,7 +445,7 @@ function renderBudget(){
 
   const rows = filtered.map(b => `
     <div class="b-card list-row" data-row data-id="${b.id}" style="flex-direction:column;align-items:stretch;">
-      <div class="row-top" style="display:flex;align-items:flex-start;gap:8px;">
+      <div class="row-top" style="display:flex;align-items:flex-start;gap:6px;">
         <div style="flex:1;min-width:0;">
           <input class="cat-input" data-field="category" data-id="${b.id}" value="${esc(b.category)}" />
           <input class="item-input" data-field="item" data-id="${b.id}" value="${esc(b.item)}" />
@@ -446,9 +453,7 @@ function renderBudget(){
         <button class="del-btn" data-action="delete-budget" data-id="${b.id}">✕</button>
       </div>
       <div class="b-row2">
-        <span>予算</span>
-        <input class="num-sm" type="number" data-field="min" data-id="${b.id}" value="${b.min}" />
-        <span>〜</span>
+        <span>上限</span>
         <input class="num-sm" type="number" data-field="max" data-id="${b.id}" value="${b.max}" />
         <span class="badge" style="background:${STATUS_COLOR[b.status]||COLORS.surfaceDeep};margin-left:auto;">${esc(b.status)}</span>
       </div>
@@ -463,7 +468,7 @@ function renderBudget(){
 
   return `
     <div class="budget-summary">
-      <div class="summary-row"><span>予算目安</span><span class="val">${yen(totalMin)} 〜 ${yen(totalMax)}</span></div>
+      <div class="summary-row"><span>予算上限合計</span><span class="val">${yen(totalMax)}</span></div>
       <div class="summary-row"><span>実支出（入力済 ${actualCount}件）</span><span class="val" style="color:${COLORS.accentDeep};">${yen(totalActual)}</span></div>
     </div>
     ${filterChips}
@@ -492,8 +497,10 @@ function renderInfo(){
     <div class="info-section">
       <p class="info-section-title">電気</p>
       <div class="info-row"><span class="info-label">電力会社</span>${f('electricCompany','text','九州電力 など')}</div>
+      <div class="info-row"><span class="info-label">電話番号</span>${f('electricPhone','tel')}</div>
       <div class="info-row"><span class="info-label">お客様番号</span>${f('electricNo','text')}</div>
       <div class="info-row"><span class="info-label">開通日</span>${f('electricOpenDate','date')}</div>
+      <div class="info-row"><span class="info-label">URL</span>${f('electricUrl','url','https://')}</div>
     </div>
     <div class="info-section">
       <p class="info-section-title">ガス</p>
@@ -501,24 +508,29 @@ function renderInfo(){
       <div class="info-row"><span class="info-label">電話番号</span>${f('gasPhone','tel')}</div>
       <div class="info-row"><span class="info-label">お客様番号</span>${f('gasNo','text')}</div>
       <div class="info-row"><span class="info-label">開栓日</span>${f('gasOpenDate','date')}</div>
+      <div class="info-row"><span class="info-label">URL</span>${f('gasUrl','url','https://')}</div>
     </div>
     <div class="info-section">
       <p class="info-section-title">水道</p>
       <div class="info-row"><span class="info-label">水道局名</span>${f('waterCompany','text','北九州市水道局 など')}</div>
       <div class="info-row"><span class="info-label">電話番号</span>${f('waterPhone','tel')}</div>
       <div class="info-row"><span class="info-label">お客様番号</span>${f('waterNo','text')}</div>
+      <div class="info-row"><span class="info-label">使用開始日</span>${f('waterOpenDate','date')}</div>
+      <div class="info-row"><span class="info-label">URL</span>${f('waterUrl','url','https://')}</div>
     </div>
     <div class="info-section">
       <p class="info-section-title">インターネット</p>
       <div class="info-row"><span class="info-label">プロバイダ</span>${f('internetProvider','text','NURO / ドコモ光 など')}</div>
       <div class="info-row"><span class="info-label">種別</span>${f('internetType','text','光ファイバー など')}</div>
       <div class="info-row"><span class="info-label">開通予定日</span>${f('internetOpenDate','date')}</div>
+      <div class="info-row"><span class="info-label">URL</span>${f('internetUrl','url','https://')}</div>
     </div>
     <div class="info-section">
       <p class="info-section-title">不動産・管理会社</p>
       <div class="info-row"><span class="info-label">会社名</span>${f('agentName','text')}</div>
       <div class="info-row"><span class="info-label">電話番号</span>${f('agentPhone','tel')}</div>
       <div class="info-row"><span class="info-label">担当者</span>${f('agentPerson','text')}</div>
+      <div class="info-row"><span class="info-label">URL</span>${f('agentUrl','url','https://')}</div>
     </div>
     <div class="info-section">
       <p class="info-section-title">メモ</p>
@@ -542,6 +554,7 @@ function renderLayout(){
       style="top:${f.top}%; left:${f.left}%; width:${f.width}%; height:${f.height}%; background:${f.color}; transform:rotate(${f.rotate||0}deg); border-radius:${f.shape==='circle'?'50%':'6px'};">
       <span>${esc(f.label)}</span>
       <button class="furn-rotate-btn" data-action="rotate-furniture" data-id="${f.id}">↻</button>
+      <div class="furn-front furn-front-${f.front||'none'}"></div>
     </div>`).join("");
 
   let editPanels = "";
@@ -556,7 +569,7 @@ function renderLayout(){
           <label>上 mm<input type="number" data-field="top" data-kind="zone" data-id="${z.id}" value="${pctToMm(z.top,'y')}" /></label>
           <label>左 mm<input type="number" data-field="left" data-kind="zone" data-id="${z.id}" value="${pctToMm(z.left,'x')}" /></label>
           <label>幅 mm<input type="number" data-field="width" data-kind="zone" data-id="${z.id}" value="${pctToMm(z.width,'x')}" /></label>
-          <label>高さ mm<input type="number" data-field="height" data-kind="zone" data-id="${z.id}" value="${pctToMm(z.height,'y')}" /></label>
+          <label>奥行 mm<input type="number" data-field="height" data-kind="zone" data-id="${z.id}" value="${pctToMm(z.height,'y')}" /></label>
         </div>
         <div class="swatches" style="margin-top:6px;">
           ${ZONE_SWATCHES.map(c=>`<span class="swatch ${c===z.fill?'selected':''}" style="background:${c};" data-action="set-zone-color" data-id="${z.id}" data-color="${c}"></span>`).join("")}
@@ -573,14 +586,29 @@ function renderLayout(){
         </div>
         <div class="grid4" style="grid-template-columns:repeat(2,1fr);">
           <label>幅 mm<input type="number" data-field="width" data-kind="furniture" data-id="${f.id}" value="${pctToMm(f.width,'x')}" /></label>
-          <label>高さ mm<input type="number" data-field="height" data-kind="furniture" data-id="${f.id}" value="${pctToMm(f.height,'y')}" /></label>
+          <label>奥行 mm<input type="number" data-field="height" data-kind="furniture" data-id="${f.id}" value="${pctToMm(f.height,'y')}" /></label>
         </div>
         <div class="swatches">
           ${SWATCHES.map(c=>`<span class="swatch ${c===f.color?'selected':''}" style="background:${c};" data-action="set-furniture-color" data-id="${f.id}" data-color="${c}"></span>`).join("")}
         </div>
+        <div style="display:flex;gap:4px;margin-top:6px;align-items:center;flex-wrap:wrap;">
+          <span style="font-size:10px;color:var(--text-soft);">前面</span>
+          ${[{v:"none",l:"なし"},{v:"top",l:"上"},{v:"right",l:"右"},{v:"bottom",l:"下"},{v:"left",l:"左"}].map(({v,l})=>
+            `<button class="del-btn" style="font-size:10px;padding:2px 6px;border-radius:5px;border:1px solid var(--line);${(f.front||'none')===v?'background:var(--accent);color:#fff;border-color:var(--accent);':''}" data-action="set-furniture-front" data-id="${f.id}" data-front="${v}">${l}</button>`
+          ).join("")}
+        </div>
       </div>`).join("");
 
     editPanels = `
+      <div class="edit-section">
+        <p class="edit-section-title">方角ラベル</p>
+        <div class="grid4">
+          <label>上<input type="text" data-plan-label="top" value="${esc(state.planLabels.top)}" /></label>
+          <label>右<input type="text" data-plan-label="right" value="${esc(state.planLabels.right)}" /></label>
+          <label>下<input type="text" data-plan-label="bottom" value="${esc(state.planLabels.bottom)}" /></label>
+          <label>左<input type="text" data-plan-label="left" value="${esc(state.planLabels.left)}" /></label>
+        </div>
+      </div>
       <div class="edit-section">
         <p class="edit-section-title">フロアプランの実寸</p>
         <div class="grid4" style="grid-template-columns:repeat(2,1fr);margin-bottom:8px;">
@@ -611,12 +639,12 @@ function renderLayout(){
       <span class="muted">家具はいつでもドラッグ可能</span>
       <button class="edit-toggle" style="${editBtnStyle}" data-action="toggle-edit">${state.layoutEdit?'編集を終える':'間取りを編集'}</button>
     </div>
-    <div class="compass"><span>上＝西</span><span>右＝北（入口）</span></div>
+    <div class="compass"><span data-edge="top">上＝${esc(state.planLabels.top)}</span><span data-edge="right">右＝${esc(state.planLabels.right)}</span></div>
     <div class="floor-plan" id="floor-plan">
       ${zoneBoxes}
       ${furnitureBoxes}
-      <div class="edge-label" style="left:2px;top:50%;transform:translateY(-50%) rotate(-90deg);transform-origin:left;">南（バルコニー）</div>
-      <div class="edge-label" style="bottom:2px;right:46%;">東</div>
+      <div class="edge-label" data-edge="left" style="left:2px;top:50%;transform:translateY(-50%) rotate(-90deg);transform-origin:left;">${esc(state.planLabels.left)}</div>
+      <div class="edge-label" data-edge="bottom" style="bottom:2px;right:46%;">${esc(state.planLabels.bottom)}</div>
     </div>
     ${legend}
     ${editPanels}
@@ -652,7 +680,7 @@ function renderDataPanel(){
     <div class="panel" style="margin-top:8px;">
       <p class="panel-title">書き出し（現在のデータをコピーして保管）</p>
       <textarea class="field" id="export-area" rows="5" readonly>${esc(exportDataJSON())}</textarea>
-      <button class="btn btn-ghost" data-action="copy-export" style="margin-bottom:14px;">コピー</button>
+      <button class="btn btn-ghost" data-action="copy-export" style="margin-bottom:12px;">コピー</button>
       <p class="panel-title">読み込み（書き出したJSONを貼り付けて上書き）</p>
       <textarea class="field" id="import-area" rows="5" placeholder="ここにJSONを貼り付け"></textarea>
       <button class="btn btn-primary" data-action="import-data">読み込む（現在のデータを上書き）</button>
@@ -878,7 +906,7 @@ document.addEventListener("click", (e) => {
   }
   else if(action === "delete-furniture"){ state.furniture = state.furniture.filter(f=>f.id!==id); saveNow(STORAGE_KEYS.furniture, state.furniture); render(); }
   else if(action === "add-furniture"){
-    state.furniture.push({ id:uid("f"), label:"新しい家具", top:20, left:20, width:15, height:8, color:COLORS.accent });
+    state.furniture.push({ id:uid("f"), label:"新しい家具", top:20, left:20, width:15, height:8, color:COLORS.accent, rotate:0, shape:"rect", front:"none" });
     saveNow(STORAGE_KEYS.furniture, state.furniture);
     render();
   }
@@ -893,6 +921,10 @@ document.addEventListener("click", (e) => {
   else if(action === "set-furniture-shape"){
     const f = state.furniture.find(x=>x.id===id);
     if(f){ f.shape = btn.dataset.shape; saveNow(STORAGE_KEYS.furniture, state.furniture); render(); }
+  }
+  else if(action === "set-furniture-front"){
+    const f = state.furniture.find(x=>x.id===id);
+    if(f){ f.front = btn.dataset.front; saveNow(STORAGE_KEYS.furniture, state.furniture); render(); }
   }
   else if(action === "rotate-furniture"){
     const f = state.furniture.find(x=>x.id===id);
@@ -948,6 +980,18 @@ document.addEventListener("input", (e) => {
     debSave(STORAGE_KEYS.info, state.info);
     return;
   }
+  if(t.dataset.planLabel !== undefined){
+    const edge = t.dataset.planLabel;
+    state.planLabels[edge] = t.value;
+    const compassEl = document.querySelector(`[data-edge="${edge}"]`);
+    if(compassEl){
+      if(edge === 'top') compassEl.textContent = `上＝${t.value}`;
+      else if(edge === 'right') compassEl.textContent = `右＝${t.value}`;
+      else compassEl.textContent = t.value;
+    }
+    debSave(STORAGE_KEYS.planLabels, state.planLabels);
+    return;
+  }
   const id = t.dataset.id, field = t.dataset.field, kind = t.dataset.kind;
   if(!field || !id) return;
 
@@ -996,12 +1040,11 @@ document.addEventListener("input", (e) => {
 function updateBudgetTotals(){
   const wrap = document.querySelector(".budget-summary");
   if(!wrap) return;
-  const totalMin = state.budget.reduce((s,b)=>s+(Number(b.min)||0),0);
   const totalMax = state.budget.reduce((s,b)=>s+(Number(b.max)||0),0);
   const totalActual = state.budget.reduce((s,b)=>s+(Number(b.actual)||0),0);
   const actualCount = state.budget.filter(b=>b.actual!=null && b.actual!=="").length;
   const rows = wrap.querySelectorAll(".summary-row .val");
-  if(rows[0]) rows[0].textContent = `${yen(totalMin)} 〜 ${yen(totalMax)}`;
+  if(rows[0]) rows[0].textContent = yen(totalMax);
   if(rows[1]) rows[1].textContent = yen(totalActual);
   const label = wrap.querySelectorAll(".summary-row span:first-child")[1];
   if(label) label.textContent = `実支出（入力済 ${actualCount}件）`;
