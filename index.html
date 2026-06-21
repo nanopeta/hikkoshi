@@ -189,11 +189,11 @@ const DEFAULT_ZONES = [
 ];
 
 const DEFAULT_FURNITURE = [
-  { id:"f1", label:"ベッド",               top:46, left:11, width:34, height:11, color:COLORS.accent,    rotate:0 },
-  { id:"f2", label:"デスク(FlexiSpot)",    top:6,  left:12, width:19, height:9,  color:COLORS.beige,     rotate:0 },
-  { id:"f3", label:"モニター",             top:5,  left:32, width:7,  height:6,  color:COLORS.gray,      rotate:0 },
-  { id:"f4", label:"ローテーブル",         top:70, left:38, width:17, height:9,  color:COLORS.beige,     rotate:0 },
-  { id:"f5", label:"プロジェクター画面(東壁)", top:96, left:32, width:30, height:4,  color:COLORS.accentDeep, rotate:0 },
+  { id:"f1", label:"ベッド",               top:46, left:11, width:34, height:11, color:COLORS.accent,    rotate:0, shape:"rect" },
+  { id:"f2", label:"デスク(FlexiSpot)",    top:6,  left:12, width:19, height:9,  color:COLORS.beige,     rotate:0, shape:"rect" },
+  { id:"f3", label:"モニター",             top:5,  left:32, width:7,  height:6,  color:COLORS.gray,      rotate:0, shape:"rect" },
+  { id:"f4", label:"ローテーブル",         top:70, left:38, width:17, height:9,  color:COLORS.beige,     rotate:0, shape:"rect" },
+  { id:"f5", label:"プロジェクター画面(東壁)", top:96, left:32, width:30, height:4,  color:COLORS.accentDeep, rotate:0, shape:"rect" },
 ];
 
 const SWATCHES = [COLORS.accent, COLORS.accentDeep, COLORS.beige, COLORS.gray, COLORS.danger, COLORS.done];
@@ -457,7 +457,7 @@ function renderLayout(){
 
   const furnitureBoxes = state.furniture.map(f => `
     <div class="furniture-box" data-furniture-drag="${f.id}"
-      style="top:${f.top}%; left:${f.left}%; width:${f.width}%; height:${f.height}%; background:${f.color}; transform:rotate(${f.rotate||0}deg);">
+      style="top:${f.top}%; left:${f.left}%; width:${f.width}%; height:${f.height}%; background:${f.color}; transform:rotate(${f.rotate||0}deg); border-radius:${f.shape==='circle'?'50%':'6px'};">
       <span>${esc(f.label)}</span>
     </div>`).join("");
 
@@ -481,6 +481,7 @@ function renderLayout(){
       <div class="edit-card">
         <div class="row-top">
           <input class="field" style="margin:0;" data-field="label" data-kind="furniture" data-id="${f.id}" value="${esc(f.label)}" />
+          <button class="del-btn" data-action="set-furniture-shape" data-id="${f.id}" data-shape="${f.shape==='circle'?'rect':'circle'}" title="形状切替" style="color:var(--accent);font-size:15px;">${f.shape==='circle'?'○':'□'}</button>
           <button class="del-btn" data-action="rotate-furniture" data-id="${f.id}" title="90°回転" style="color:var(--accent);font-size:15px;">↻${f.rotate||0}°</button>
           <button class="del-btn" data-action="delete-furniture" data-id="${f.id}">✕</button>
         </div>
@@ -761,6 +762,10 @@ document.addEventListener("click", (e) => {
   else if(action === "set-furniture-color"){
     const f = state.furniture.find(x=>x.id===id);
     if(f){ f.color = btn.dataset.color; saveNow(STORAGE_KEYS.furniture, state.furniture); render(); }
+  }
+  else if(action === "set-furniture-shape"){
+    const f = state.furniture.find(x=>x.id===id);
+    if(f){ f.shape = btn.dataset.shape; saveNow(STORAGE_KEYS.furniture, state.furniture); render(); }
   }
   else if(action === "rotate-furniture"){
     const f = state.furniture.find(x=>x.id===id);
