@@ -132,7 +132,7 @@ const COLORS = {
   text:"#2C2F33", textSoft:"#6B7076", danger:"#C16456", warn:"#BD8A45", done:"#7E9A82", line:"#DADDE1",
 };
 
-const STORAGE_KEYS = { tasks:"movehub-tasks-v1", budget:"movehub-budget-v1", furniture:"movehub-furniture-v1", zones:"movehub-zones-v1" };
+const STORAGE_KEYS = { tasks:"movehub-tasks-v1", budget:"movehub-budget-v1", furniture:"movehub-furniture-v1", zones:"movehub-zones-v1", planSize:"movehub-plansize-v1" };
 
 /* ====================== default data ====================== */
 const DEFAULT_TASKS = [
@@ -189,17 +189,17 @@ const DEFAULT_ZONES = [
 ];
 
 const DEFAULT_FURNITURE = [
-  { id:"f1", label:"ベッド", top:46, left:11, width:34, height:11, color:COLORS.accent },
-  { id:"f2", label:"デスク(FlexiSpot)", top:6, left:12, width:19, height:9, color:COLORS.beige },
-  { id:"f3", label:"モニター", top:5, left:32, width:7, height:6, color:COLORS.gray },
-  { id:"f4", label:"ローテーブル", top:70, left:38, width:17, height:9, color:COLORS.beige },
-  { id:"f5", label:"プロジェクター画面(東壁)", top:96, left:32, width:30, height:4, color:COLORS.accentDeep },
+  { id:"f1", label:"ベッド",               top:46, left:11, width:34, height:11, color:COLORS.accent,    rotate:0 },
+  { id:"f2", label:"デスク(FlexiSpot)",    top:6,  left:12, width:19, height:9,  color:COLORS.beige,     rotate:0 },
+  { id:"f3", label:"モニター",             top:5,  left:32, width:7,  height:6,  color:COLORS.gray,      rotate:0 },
+  { id:"f4", label:"ローテーブル",         top:70, left:38, width:17, height:9,  color:COLORS.beige,     rotate:0 },
+  { id:"f5", label:"プロジェクター画面(東壁)", top:96, left:32, width:30, height:4,  color:COLORS.accentDeep, rotate:0 },
 ];
 
 const SWATCHES = [COLORS.accent, COLORS.accentDeep, COLORS.beige, COLORS.gray, COLORS.danger, COLORS.done];
 
 /* ====================== state ====================== */
-const state = { tab:"tasks", tasks:[], budget:[], zones:[], furniture:[], layoutEdit:false, dataPanelOpen:false, loaded:false, taskFilter:null };
+const state = { tab:"tasks", tasks:[], budget:[], zones:[], furniture:[], layoutEdit:false, dataPanelOpen:false, loaded:false, taskFilter:null, planWidth:5000, planHeight:5000 };
 const saveTimers = {};
 
 function showToast(message, opts={}){
@@ -260,6 +260,9 @@ async function loadAll(){
   state.budget = await loadKey(STORAGE_KEYS.budget, DEFAULT_BUDGET);
   state.zones = await loadKey(STORAGE_KEYS.zones, DEFAULT_ZONES);
   state.furniture = await loadKey(STORAGE_KEYS.furniture, DEFAULT_FURNITURE);
+  const planSize = await loadKey(STORAGE_KEYS.planSize, {w:5000, h:5000});
+  state.planWidth = planSize.w || 5000;
+  state.planHeight = planSize.h || 5000;
 
   // 初期費用(物件)を1項目にまとめる
   const breakdownIds = ["b15","b16","b17","b18","b19","b20","b21","b22","b23","b24"];
@@ -284,6 +287,8 @@ const uid = (p) => `${p}${Date.now()}_${Math.random().toString(36).slice(2,6)}`;
 const yen = (n) => (n === null || n === undefined || n === "" ? "-" : `¥${Number(n).toLocaleString()}`);
 const clampNum = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const esc = (s) => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const pctToMm = (pct, axis) => Math.round(pct / 100 * (axis === 'x' ? state.planWidth : state.planHeight));
+const mmToPct = (mm, axis) => mm / (axis === 'x' ? state.planWidth : state.planHeight) * 100;
 
 function daysUntil(dateStr){
   if(!dateStr) return null;
@@ -452,7 +457,7 @@ function renderLayout(){
 
   const furnitureBoxes = state.furniture.map(f => `
     <div class="furniture-box" data-furniture-drag="${f.id}"
-      style="top:${f.top}%; left:${f.left}%; width:${f.width}%; height:${f.height}%; background:${f.color};">
+      style="top:${f.top}%; left:${f.left}%; width:${f.width}%; height:${f.height}%; background:${f.color}; transform:rotate(${f.rotate||0}deg);">
       <span>${esc(f.label)}</span>
     </div>`).join("");
 
@@ -465,10 +470,10 @@ function renderLayout(){
           <button class="del-btn" data-action="delete-zone" data-id="${z.id}">✕</button>
         </div>
         <div class="grid4">
-          <label>上<input type="number" data-field="top" data-kind="zone" data-id="${z.id}" value="${z.top}" /></label>
-          <label>左<input type="number" data-field="left" data-kind="zone" data-id="${z.id}" value="${z.left}" /></label>
-          <label>幅<input type="number" data-field="width" data-kind="zone" data-id="${z.id}" value="${z.width}" /></label>
-          <label>高さ<input type="number" data-field="height" data-kind="zone" data-id="${z.id}" value="${z.height}" /></label>
+          <label>上 mm<input type="number" data-field="top" data-kind="zone" data-id="${z.id}" value="${pctToMm(z.top,'y')}" /></label>
+          <label>左 mm<input type="number" data-field="left" data-kind="zone" data-id="${z.id}" value="${pctToMm(z.left,'x')}" /></label>
+          <label>幅 mm<input type="number" data-field="width" data-kind="zone" data-id="${z.id}" value="${pctToMm(z.width,'x')}" /></label>
+          <label>高さ mm<input type="number" data-field="height" data-kind="zone" data-id="${z.id}" value="${pctToMm(z.height,'y')}" /></label>
         </div>
       </div>`).join("");
 
@@ -476,11 +481,12 @@ function renderLayout(){
       <div class="edit-card">
         <div class="row-top">
           <input class="field" style="margin:0;" data-field="label" data-kind="furniture" data-id="${f.id}" value="${esc(f.label)}" />
+          <button class="del-btn" data-action="rotate-furniture" data-id="${f.id}" title="90°回転" style="color:var(--accent);font-size:15px;">↻${f.rotate||0}°</button>
           <button class="del-btn" data-action="delete-furniture" data-id="${f.id}">✕</button>
         </div>
         <div class="grid4" style="grid-template-columns:repeat(2,1fr);">
-          <label>幅<input type="number" data-field="width" data-kind="furniture" data-id="${f.id}" value="${f.width}" /></label>
-          <label>高さ<input type="number" data-field="height" data-kind="furniture" data-id="${f.id}" value="${f.height}" /></label>
+          <label>幅 mm<input type="number" data-field="width" data-kind="furniture" data-id="${f.id}" value="${pctToMm(f.width,'x')}" /></label>
+          <label>高さ mm<input type="number" data-field="height" data-kind="furniture" data-id="${f.id}" value="${pctToMm(f.height,'y')}" /></label>
         </div>
         <div class="swatches">
           ${SWATCHES.map(c=>`<span class="swatch ${c===f.color?'selected':''}" style="background:${c};" data-action="set-furniture-color" data-id="${f.id}" data-color="${c}"></span>`).join("")}
@@ -488,6 +494,14 @@ function renderLayout(){
       </div>`).join("");
 
     editPanels = `
+      <div class="edit-section">
+        <p class="edit-section-title">フロアプランの実寸</p>
+        <div class="grid4" style="grid-template-columns:repeat(2,1fr);margin-bottom:8px;">
+          <label>横幅 mm<input class="grid4 input" type="number" id="plan-w" value="${state.planWidth}" /></label>
+          <label>奥行き mm<input class="grid4 input" type="number" id="plan-h" value="${state.planHeight}" /></label>
+        </div>
+        <button class="btn btn-ghost" data-action="apply-plan-size">実寸を適用</button>
+      </div>
       <div class="edit-section">
         <p class="edit-section-title">部屋を編集</p>
         ${zoneCards}
@@ -717,6 +731,17 @@ document.addEventListener("click", (e) => {
     const f = state.furniture.find(x=>x.id===id);
     if(f){ f.color = btn.dataset.color; saveNow(STORAGE_KEYS.furniture, state.furniture); render(); }
   }
+  else if(action === "rotate-furniture"){
+    const f = state.furniture.find(x=>x.id===id);
+    if(f){ f.rotate = ((f.rotate||0) + 90) % 360; saveNow(STORAGE_KEYS.furniture, state.furniture); render(); }
+  }
+  else if(action === "apply-plan-size"){
+    const w = Number(document.getElementById("plan-w").value) || 5000;
+    const h = Number(document.getElementById("plan-h").value) || 5000;
+    state.planWidth = w; state.planHeight = h;
+    saveNow(STORAGE_KEYS.planSize, {w, h});
+    render();
+  }
 
   else if(action === "toggle-data-panel"){ state.dataPanelOpen = !state.dataPanelOpen; render(); }
   else if(action === "copy-export"){
@@ -766,7 +791,8 @@ document.addEventListener("input", (e) => {
       const lbl = document.querySelector(`[data-zone-drag="${id}"] .zone-label`);
       if(lbl) lbl.textContent = t.value;
     } else {
-      z[field] = clampNum(Number(t.value)||0, 0, 100);
+      const axis = (field==='top'||field==='height') ? 'y' : 'x';
+      z[field] = clampNum(mmToPct(Number(t.value)||0, axis), 0, 100);
       const box = document.querySelector(`[data-zone-drag="${id}"]`);
       if(box) box.style[field] = z[field] + "%";
     }
@@ -781,7 +807,8 @@ document.addEventListener("input", (e) => {
       const span = document.querySelector(`[data-furniture-drag="${id}"] span`);
       if(span) span.textContent = t.value;
     } else {
-      f[field] = clampNum(Number(t.value)||0, 0, 100);
+      const axis = field === 'height' ? 'y' : 'x';
+      f[field] = clampNum(mmToPct(Number(t.value)||0, axis), 0, 100);
       const box = document.querySelector(`[data-furniture-drag="${id}"]`);
       if(box) box.style[field] = f[field] + "%";
     }
