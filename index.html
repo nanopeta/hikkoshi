@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>引っ越し手帖</title>
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icon-192.png" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<meta name="theme-color" content="#54677A" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="引っ越し手帖" />
+<style>
+  :root{
+    --base:#FFFFFF; --surface:#EEF0F2; --surface-deep:#E2E5E9;
+    --accent:#71889F; --accent-deep:#54677A; --beige:#CDBFA7; --gray:#AFAFAE;
+    --text:#2C2F33; --text-soft:#6B7076; --danger:#C16456; --warn:#BD8A45; --done:#7E9A82; --line:#DADDE1;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html,body{ margin:0; padding:0; }
+  body{ background:var(--surface); font-family:'Hiragino Sans','Hiragino Kaku Gothic ProN','Noto Sans JP',system-ui,sans-serif; color:var(--text); }
+  #app{ max-width:480px; margin:0 auto; padding:16px 16px 40px; }
+
+  header.app-header{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .eyebrow{ font-size:10px; letter-spacing:.14em; color:var(--accent-deep); margin:0; }
+  h1{ font-size:18px; font-weight:700; margin:2px 0 0; }
+
+  .next-due{ background:var(--accent-deep); color:#fff; border-radius:12px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:14px; font-size:12px; }
+  .next-due b{ font-weight:700; white-space:nowrap; }
+
+  .tabs{ display:flex; gap:6px; margin-bottom:14px; }
+  .tab-btn{ flex:1; padding:9px 4px; border-radius:10px; border:1px solid var(--line); background:var(--base); color:var(--text-soft); font-size:13px; font-weight:600; cursor:pointer; }
+  .tab-btn.active{ background:var(--accent); color:#fff; border-color:var(--accent); }
+
+  .muted{ color:var(--text-soft); font-size:12px; }
+  .small{ font-size:11px; }
+
+  .toprow{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .check-inline{ display:flex; align-items:center; gap:4px; font-size:11px; color:var(--text-soft); }
+
+  .list{ display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
+  .list-row{ display:flex; align-items:flex-start; gap:8px; background:var(--base); border:1px solid var(--line); border-radius:12px; padding:8px; }
+  .list-row.done-row{ background:#F5F6F7; }
+  .list-row.dragging{ opacity:.55; box-shadow:0 4px 10px rgba(0,0,0,.12); }
+  .reorder-handle{ touch-action:none; cursor:grab; color:var(--gray); font-size:16px; padding:2px 4px; line-height:1; user-select:none; }
+  .row-main{ flex:1; min-width:0; }
+  .task-title{ font-size:14px; margin:0; }
+  .task-title.done{ color:var(--text-soft); text-decoration:line-through; }
+  .chips{ display:flex; gap:5px; margin-top:6px; flex-wrap:wrap; }
+  .chip{ font-size:11px; padding:2px 6px; border-radius:6px; background:var(--surface); color:var(--text-soft); white-space:nowrap; }
+  .del-btn{ border:none; background:none; color:var(--gray); font-size:13px; cursor:pointer; padding:2px 4px; }
+  input[type=checkbox]{ width:16px; height:16px; accent-color:var(--accent); margin-top:2px; }
+
+  .panel{ background:var(--surface); border-radius:12px; padding:12px; }
+  .panel-title{ font-size:12px; font-weight:600; color:var(--accent-deep); margin:0 0 8px; }
+  .field{ width:100%; font-size:14px; padding:8px; border-radius:10px; border:1px solid var(--line); background:var(--base); outline:none; color:var(--text); margin-bottom:8px; }
+  .field-row{ display:flex; gap:8px; }
+  .field-row .field{ margin-bottom:0; }
+  .btn{ display:block; width:100%; text-align:center; font-size:14px; font-weight:600; padding:10px; border-radius:10px; border:none; cursor:pointer; }
+  .btn-primary{ background:var(--accent); color:#fff; }
+  .btn-ghost{ background:var(--surface-deep); color:var(--accent-deep); }
+
+  .budget-summary{ background:var(--surface-deep); border-radius:12px; padding:12px; margin-bottom:14px; }
+  .summary-row{ display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px; }
+  .summary-row:last-child{ margin-bottom:0; }
+  .summary-row .val{ font-weight:700; }
+
+  .b-card{ background:var(--base); border:1px solid var(--line); border-radius:12px; padding:10px; }
+  .b-card .cat-input{ font-size:11px; color:var(--text-soft); border:none; background:transparent; padding:0; width:100%; outline:none; }
+  .b-card .item-input{ font-size:14px; font-weight:600; border:none; background:transparent; padding:0; width:100%; outline:none; color:var(--text); }
+  .b-row2{ display:flex; align-items:center; gap:6px; margin-top:8px; flex-wrap:wrap; font-size:12px; color:var(--text-soft); }
+  .num-sm{ width:78px; padding:6px 7px; border-radius:8px; border:1px solid var(--line); font-size:13px; outline:none; }
+  .badge{ font-size:11px; padding:2px 7px; border-radius:7px; color:#fff; white-space:nowrap; }
+  .b-row3{ display:flex; gap:8px; margin-top:8px; }
+  .b-row3 .num-sm{ flex:1; width:auto; }
+  select.field, select.num-sm{ -webkit-appearance:none; }
+
+  .layout-note{ display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px; }
+  .edit-toggle{ font-size:11px; padding:5px 9px; border-radius:8px; border:none; cursor:pointer; font-weight:600; white-space:nowrap; }
+  .compass{ display:flex; justify-content:space-between; font-size:11px; color:var(--text-soft); padding:0 4px; margin-bottom:4px; }
+  .floor-plan{ position:relative; width:100%; padding-top:100%; border:1px solid var(--line); border-radius:12px; background:var(--base); overflow:hidden; touch-action:none; user-select:none; }
+  .zone-box, .furniture-box{ position:absolute; }
+  .zone-box{ display:flex; align-items:flex-start; padding:4px; border:1px solid var(--line); }
+  .zone-box.editable{ border-color:var(--accent); cursor:grab; }
+  .zone-label{ font-size:10px; line-height:1.2; color:var(--text-soft); }
+  .furniture-box{ display:flex; align-items:center; justify-content:center; text-align:center; border-radius:6px; box-shadow:0 2px 4px rgba(0,0,0,.15); cursor:grab; z-index:10; }
+  .furniture-box span{ font-size:10px; color:#fff; padding:0 2px; line-height:1.2; }
+  .edge-label{ position:absolute; font-size:10px; color:var(--text-soft); }
+
+  .edit-section{ margin-top:14px; }
+  .edit-section-title{ font-size:12px; font-weight:600; color:var(--accent-deep); margin:0 0 8px; }
+  .edit-card{ background:var(--surface); border-radius:12px; padding:10px; margin-bottom:8px; }
+  .edit-card .row-top{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .grid4{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; font-size:11px; color:var(--text-soft); }
+  .grid4 label{ display:flex; flex-direction:column; gap:2px; }
+  .grid4 input{ padding:5px; border-radius:6px; border:1px solid var(--line); font-size:12px; color:var(--text); background:var(--base); }
+  .swatches{ display:flex; gap:6px; margin-top:8px; }
+  .swatch{ width:22px; height:22px; border-radius:6px; border:2px solid transparent; cursor:pointer; }
+  .swatch.selected{ border-color:var(--text); }
+  .reset-btn{ margin-top:12px; }
+  .loading{ text-align:center; padding:40px 0; color:var(--text-soft); font-size:13px; }
+
+  .save-toast{ position:fixed; left:50%; bottom:18px; transform:translateX(-50%) translateY(16px); background:var(--text); color:#fff; padding:10px 14px; border-radius:12px; font-size:12px; display:flex; align-items:center; gap:10px; opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease; max-width:88%; z-index:1000; box-shadow:0 6px 16px rgba(0,0,0,.25); }
+  .save-toast.show{ opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto; }
+  .save-toast button{ background:var(--accent); color:#fff; border:none; padding:6px 10px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap; flex-shrink:0; }
+
+  .data-panel-toggle{ text-align:center; margin-top:18px; }
+  .link-btn{ background:none; border:none; color:var(--text-soft); font-size:12px; cursor:pointer; padding:6px; }
+  textarea.field{ font-family: ui-monospace, 'SF Mono', Consolas, monospace; font-size:11px; resize:vertical; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="save-toast" class="save-toast"></div>
+<script>
+/* ====================== design tokens ====================== */
+const COLORS = {
+  base:"#FFFFFF", surface:"#EEF0F2", surfaceDeep:"#E2E5E9",
+  accent:"#71889F", accentDeep:"#54677A", beige:"#CDBFA7", gray:"#AFAFAE",
+  text:"#2C2F33", textSoft:"#6B7076", danger:"#C16456", warn:"#BD8A45", done:"#7E9A82", line:"#DADDE1",
+};
+
+const STORAGE_KEYS = { tasks:"movehub-tasks-v1", budget:"movehub-budget-v1", furniture:"movehub-furniture-v1", zones:"movehub-zones-v1" };
+
+/* ====================== default data ====================== */
+const DEFAULT_TASKS = [
+  { id:"t1", title:"ガス開栓予約の電話（093-471-7314）", category:"ライフライン", due:"2026-06-23", done:false },
+  { id:"t2", title:"火災保険 付保証明書PDF提出", category:"契約", due:"2026-06-24", done:false },
+  { id:"t3", title:"鍵引渡し（エイブル小倉店 12:00）", category:"契約", due:"2026-06-24", done:false },
+  { id:"t4", title:"冷蔵庫 設置先情報フォーム回答（ヤマダ電機）", category:"家具家電", due:"2026-07-04", done:false },
+  { id:"t5", title:"洗濯機本体の購入", category:"家具家電", due:null, done:false },
+  { id:"t6", title:"郵便物転送届（e転居）", category:"役所", due:null, done:false },
+  { id:"t7", title:"勤務先へ住所変更届", category:"勤務先", due:null, done:false },
+  { id:"t8", title:"荷物輸送の手配（アートセッティングデリバリー）", category:"引越し", due:null, done:false },
+  { id:"t9", title:"転入届（北九州市小倉北区役所・転居後14日以内）", category:"役所", due:null, done:false },
+  { id:"t10", title:"転出届（下関市役所・完全移行のタイミングで）", category:"役所", due:null, done:false },
+  { id:"t11", title:"マイナンバーカード住所変更（転入届と同時）", category:"役所", due:null, done:false },
+  { id:"t12", title:"運転免許証の住所変更（転入届のあと）", category:"役所", due:null, done:false },
+  { id:"t13", title:"印鑑登録（必要なら小倉北区で新規）", category:"役所", due:null, done:false },
+  { id:"t14", title:"銀行・カード・証券会社の住所変更", category:"住所変更", due:null, done:false },
+  { id:"t15", title:"スマホの住所変更", category:"住所変更", due:null, done:false },
+  { id:"t16", title:"NHK受信契約の住所変更", category:"住所変更", due:null, done:false },
+  { id:"t17", title:"通販サイト（楽天等）の登録住所変更", category:"住所変更", due:null, done:false },
+];
+
+const DEFAULT_BUDGET = [
+  { id:"b1", category:"家電", item:"冷蔵庫（三菱 MR-CX33ML-W）", min:50000, max:50000, actual:null, status:"発注済み" },
+  { id:"b2", category:"家電", item:"洗濯機", min:40000, max:40000, actual:null, status:"未購入" },
+  { id:"b3", category:"家電", item:"電子レンジ（Sharp RE-SD18C-W）", min:20000, max:20000, actual:null, status:"商品確定" },
+  { id:"b4", category:"インテリア", item:"カーテン（遮光・ライトグレー）", min:20000, max:20000, actual:null, status:"未購入" },
+  { id:"b5", category:"インテリア", item:"レースカーテン", min:5000, max:5000, actual:null, status:"未購入" },
+  { id:"b6", category:"寝具", item:"ベッド + マットレス", min:80000, max:80000, actual:null, status:"未購入" },
+  { id:"b7", category:"寝具", item:"ベッドリネン", min:10000, max:10000, actual:null, status:"未購入" },
+  { id:"b8", category:"ワークスペース", item:"FlexiSpot 昇降デスク", min:30000, max:60000, actual:null, status:"発注済み" },
+  { id:"b9", category:"ワークスペース", item:"Pixio モニター", min:30000, max:50000, actual:null, status:"発注済み" },
+  { id:"b10", category:"ワークスペース", item:"モニターアーム", min:5000, max:10000, actual:null, status:"発注済み" },
+  { id:"b11", category:"インテリア", item:"ローテーブル（ホワイト）", min:10000, max:20000, actual:null, status:"未購入" },
+  { id:"b12", category:"インテリア", item:"ラグ", min:15000, max:15000, actual:null, status:"未購入" },
+  { id:"b13", category:"家電（後回し）", item:"ロボット掃除機", min:30000, max:80000, actual:null, status:"後回し" },
+  { id:"b14", category:"インテリア（後回し）", item:"オープンシェルフ", min:10000, max:20000, actual:null, status:"後回し" },
+];
+
+/* 契約金明細書(2026/6/18)の合計額。1項目にまとめて記入 */
+const INITIAL_COST_TOTAL = 399846; // 敷金+賃料+共益費+ネット初回+仲介手数料+鍵交換代+保証会社初回費用+火災保険(個人加入2年)
+const INITIAL_COST_ITEM = {
+  id:"b15", category:"初期費用（物件）",
+  item:"初期費用合計（敷金・賃料・共益費・ネット初回・仲介手数料・鍵交換代・保証会社・火災保険等）",
+  min:INITIAL_COST_TOTAL, max:INITIAL_COST_TOTAL, actual:INITIAL_COST_TOTAL, status:"支払済み",
+};
+
+const DEFAULT_ZONES = [
+  { id:"z1", label:"LDK", top:42, left:8, width:76, height:58, fill:COLORS.surface, z:0 },
+  { id:"z2", label:"洋室 4.3帖", top:0, left:8, width:47, height:40, fill:COLORS.surfaceDeep, z:0 },
+  { id:"z3", label:"WIC", top:4, left:57, width:14, height:18, fill:"#E6DFD2", z:1 },
+  { id:"z4", label:"キッチン", top:46, left:58, width:24, height:13, fill:"#E7CFC9", z:1 },
+  { id:"z5", label:"浴室", top:61, left:84, width:14, height:15, fill:"#D6DEE6", z:1 },
+  { id:"z6", label:"トイレ", top:78, left:84, width:14, height:15, fill:"#EBD6E0", z:1 },
+  { id:"z7", label:"玄関・廊下", top:0, left:84, width:14, height:40, fill:"#E9DCD6", z:1 },
+  { id:"z8", label:"バルコニー", top:42, left:0, width:7, height:58, fill:"#DCE7DC", z:1 },
+];
+
+const DEFAULT_FURNITURE = [
+  { id:"f1", label:"ベッド", top:46, left:11, width:34, height:11, color:COLORS.accent },
+  { id:"f2", label:"デスク(FlexiSpot)", top:6, left:12, width:19, height:9, color:COLORS.beige },
+  { id:"f3", label:"モニター", top:5, left:32, width:7, height:6, color:COLORS.gray },
+  { id:"f4", label:"ローテーブル", top:70, left:38, width:17, height:9, color:COLORS.beige },
+  { id:"f5", label:"プロジェクター画面(東壁)", top:96, left:32, width:30, height:4, color:COLORS.accentDeep },
+];
+
+const SWATCHES = [COLORS.accent, COLORS.accentDeep, COLORS.beige, COLORS.gray, COLORS.danger, COLORS.done];
+
+/* ====================== state ====================== */
+const state = { tab:"tasks", tasks:[], budget:[], zones:[], furniture:[], layoutEdit:false, dataPanelOpen:false, loaded:false };
+const saveTimers = {};
+
+function showToast(message, opts={}){
+  const toast = document.getElementById("save-toast");
+  if(!toast) return;
+  toast.innerHTML = `<span>${esc(message)}</span>` + (opts.retry ? `<button id="toast-retry-btn">再試行</button>` : "");
+  toast.classList.add("show");
+  if(opts.retry){
+    document.getElementById("toast-retry-btn").onclick = () => { hideToast(); opts.retry(); };
+  }
+  clearTimeout(toast._hideTimer);
+  if(opts.autoHideMs){
+    toast._hideTimer = setTimeout(hideToast, opts.autoHideMs);
+  }
+}
+function hideToast(){
+  const toast = document.getElementById("save-toast");
+  if(toast) toast.classList.remove("show");
+}
+
+async function persistWithRetry(key, value, attempt=1){
+  try{
+    localStorage.setItem(key, JSON.stringify(value));
+    if(attempt > 1) showToast("保存しました", { autoHideMs:1500 });
+  }catch(e){
+    console.error("storage error", e);
+    if(attempt === 1){
+      setTimeout(() => persistWithRetry(key, value, attempt+1), 500);
+    } else if(attempt < 4){
+      showToast("保存を再試行しています…", { autoHideMs:6000 });
+      setTimeout(() => persistWithRetry(key, value, attempt+1), 800*attempt);
+    } else {
+      showToast("保存に失敗しました（ブラウザの空き容量・プライベートモードをご確認ください）", {
+        retry: () => persistWithRetry(key, value, 1),
+      });
+    }
+  }
+}
+
+function debSave(key, value){
+  clearTimeout(saveTimers[key]);
+  saveTimers[key] = setTimeout(() => persistWithRetry(key, value), 250);
+}
+function saveNow(key, value){
+  persistWithRetry(key, value);
+}
+
+async function loadKey(key, fallback){
+  try{
+    const raw = localStorage.getItem(key);
+    if(raw) return JSON.parse(raw);
+  }catch(e){ /* not found or parse error */ }
+  return fallback;
+}
+
+async function loadAll(){
+  state.tasks = await loadKey(STORAGE_KEYS.tasks, DEFAULT_TASKS);
+  state.budget = await loadKey(STORAGE_KEYS.budget, DEFAULT_BUDGET);
+  state.zones = await loadKey(STORAGE_KEYS.zones, DEFAULT_ZONES);
+  state.furniture = await loadKey(STORAGE_KEYS.furniture, DEFAULT_FURNITURE);
+
+  // 初期費用(物件)を1項目にまとめる
+  const breakdownIds = ["b15","b16","b17","b18","b19","b20","b21","b22","b23","b24"];
+  const hasOldBreakdown = state.budget.some(b => breakdownIds.slice(1).includes(b.id));
+  if(hasOldBreakdown){
+    const items = state.budget.filter(b => breakdownIds.includes(b.id));
+    const sumMin = items.reduce((s,b)=>s+(Number(b.min)||0),0);
+    const sumMax = items.reduce((s,b)=>s+(Number(b.max)||0),0);
+    const sumActual = items.reduce((s,b)=>s+(Number(b.actual)||0),0);
+    state.budget = state.budget.filter(b => !breakdownIds.includes(b.id));
+    state.budget.push({ ...INITIAL_COST_ITEM, min:sumMin, max:sumMax, actual:sumActual });
+    saveNow(STORAGE_KEYS.budget, state.budget);
+  } else if(!state.budget.some(b => b.id === "b15")){
+    state.budget = [...state.budget, INITIAL_COST_ITEM];
+    saveNow(STORAGE_KEYS.budget, state.budget);
+  }
+  state.loaded = true;
+}
+
+/* ====================== utils ====================== */
+const uid = (p) => `${p}${Date.now()}_${Math.random().toString(36).slice(2,6)}`;
+const yen = (n) => (n === null || n === undefined || n === "" ? "-" : `¥${Number(n).toLocaleString()}`);
+const clampNum = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const esc = (s) => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+
+function daysUntil(dateStr){
+  if(!dateStr) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const target = new Date(dateStr + "T00:00:00");
+  return Math.round((target - today) / 86400000);
+}
+function dueBadge(due){
+  const d = daysUntil(due);
+  if(d === null) return { text:"期限なし", color:COLORS.textSoft, bg:"transparent" };
+  if(d < 0) return { text:`${-d}日超過`, color:"#fff", bg:COLORS.danger };
+  if(d === 0) return { text:"本日まで", color:"#fff", bg:COLORS.danger };
+  if(d <= 2) return { text:`あと${d}日`, color:"#fff", bg:COLORS.danger };
+  if(d <= 7) return { text:`あと${d}日`, color:"#fff", bg:COLORS.warn };
+  return { text:`あと${d}日`, color:COLORS.textSoft, bg:COLORS.surfaceDeep };
+}
+
+const STATUS_COLOR = { "発注済み":COLORS.accent, "商品確定":COLORS.beige, "未購入":COLORS.textSoft, "後回し":COLORS.gray, "購入済み":COLORS.done, "支払済み":COLORS.accentDeep };
+const STATUS_OPTIONS = ["未購入","商品確定","発注済み","購入済み","支払済み","後回し"];
+const TASK_CATEGORIES = ["役所","ライフライン","契約","家具家電","勤務先","住所変更","引越し","その他"];
+
+/* ====================== render: header ====================== */
+function floorIconSVG(){
+  return `<svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+    <rect x="2" y="2" width="36" height="36" rx="2" stroke="${COLORS.accentDeep}" stroke-width="1.6"/>
+    <line x1="2" y1="17" x2="22" y2="17" stroke="${COLORS.accentDeep}" stroke-width="1.6"/>
+    <line x1="22" y1="2" x2="22" y2="17" stroke="${COLORS.accentDeep}" stroke-width="1.6"/>
+    <line x1="31" y1="17" x2="31" y2="38" stroke="${COLORS.accentDeep}" stroke-width="1.2" stroke-dasharray="2 2"/>
+  </svg>`;
+}
+
+function renderHeader(){
+  const nextDue = state.tasks.filter(t=>!t.done && t.due).sort((a,b)=>a.due.localeCompare(b.due))[0];
+  const nextDueHTML = nextDue ? `
+    <div class="next-due">
+      <span>次の期限：${esc(nextDue.title)}</span>
+      <b>${dueBadge(nextDue.due).text}</b>
+    </div>` : "";
+  return `
+    <header class="app-header">
+      ${floorIconSVG()}
+      <div>
+        <p class="eyebrow">MOVE TO KOKURA</p>
+        <h1>引っ越し手帖</h1>
+      </div>
+    </header>
+    ${nextDueHTML}
+    <div class="tabs">
+      <button class="tab-btn ${state.tab==='tasks'?'active':''}" data-action="set-tab" data-tab="tasks">やること</button>
+      <button class="tab-btn ${state.tab==='budget'?'active':''}" data-action="set-tab" data-tab="budget">予算</button>
+      <button class="tab-btn ${state.tab==='layout'?'active':''}" data-action="set-tab" data-tab="layout">レイアウト</button>
+    </div>
+  `;
+}
+
+/* ====================== render: tasks ====================== */
+function renderTasks(){
+  const remaining = state.tasks.filter(t=>!t.done).length;
+  const rows = state.tasks.map(t => {
+    const badge = dueBadge(t.due);
+    const dueChip = (!t.done && t.due) ? `<span class="chip" style="background:${badge.bg};color:${badge.color};font-weight:600;">${badge.text}（${t.due.slice(5)}）</span>` :
+                    (!t.done && !t.due) ? `<span class="chip">期限なし</span>` : "";
+    return `
+      <div class="list-row ${t.done?'done-row':''}" data-row data-id="${t.id}">
+        <span class="reorder-handle" data-reorder-handle>⠿</span>
+        <input type="checkbox" data-action="toggle-task" data-id="${t.id}" ${t.done?'checked':''} />
+        <div class="row-main">
+          <p class="task-title ${t.done?'done':''}">${esc(t.title)}</p>
+          <div class="chips">
+            <span class="chip">${esc(t.category)}</span>
+            ${dueChip}
+          </div>
+        </div>
+        <button class="del-btn" data-action="delete-task" data-id="${t.id}">✕</button>
+      </div>`;
+  }).join("");
+
+  return `
+    <div class="toprow">
+      <span class="muted">残り ${remaining} 件 ／ ハンドル「⠿」を長押しして並び替え</span>
+    </div>
+    <div class="list" id="task-list">${rows || '<p class="muted" style="text-align:center;padding:24px 0;">タスクはありません</p>'}</div>
+    <div class="panel">
+      <p class="panel-title">タスクを追加</p>
+      <input class="field" id="new-task-title" placeholder="やること" />
+      <div class="field-row" style="margin-bottom:8px;">
+        <select class="field" id="new-task-category">
+          ${TASK_CATEGORIES.map(c=>`<option>${c}</option>`).join("")}
+        </select>
+        <input class="field" type="date" id="new-task-due" />
+      </div>
+      <button class="btn btn-primary" data-action="add-task">追加</button>
+    </div>
+  `;
+}
+
+/* ====================== render: budget ====================== */
+function renderBudget(){
+  const totalMin = state.budget.reduce((s,b)=>s+(Number(b.min)||0),0);
+  const totalMax = state.budget.reduce((s,b)=>s+(Number(b.max)||0),0);
+  const totalActual = state.budget.reduce((s,b)=>s+(Number(b.actual)||0),0);
+  const actualCount = state.budget.filter(b=>b.actual!=null && b.actual!=="").length;
+
+  const rows = state.budget.map(b => `
+    <div class="b-card list-row" data-row data-id="${b.id}" style="flex-direction:column;align-items:stretch;">
+      <div class="row-top" style="display:flex;align-items:flex-start;gap:8px;">
+        <span class="reorder-handle" data-reorder-handle>⠿</span>
+        <div style="flex:1;min-width:0;">
+          <input class="cat-input" data-field="category" data-id="${b.id}" value="${esc(b.category)}" />
+          <input class="item-input" data-field="item" data-id="${b.id}" value="${esc(b.item)}" />
+        </div>
+        <button class="del-btn" data-action="delete-budget" data-id="${b.id}">✕</button>
+      </div>
+      <div class="b-row2">
+        <span>予算</span>
+        <input class="num-sm" type="number" data-field="min" data-id="${b.id}" value="${b.min}" />
+        <span>〜</span>
+        <input class="num-sm" type="number" data-field="max" data-id="${b.id}" value="${b.max}" />
+        <span class="badge" style="background:${STATUS_COLOR[b.status]||COLORS.surfaceDeep};margin-left:auto;">${esc(b.status)}</span>
+      </div>
+      <div class="b-row3">
+        <input class="num-sm" type="number" placeholder="実際の購入額" data-field="actual" data-id="${b.id}" value="${b.actual ?? ''}" />
+        <select class="num-sm" data-field="status" data-id="${b.id}">
+          ${STATUS_OPTIONS.map(s=>`<option ${s===b.status?'selected':''}>${s}</option>`).join("")}
+        </select>
+      </div>
+    </div>
+  `).join("");
+
+  return `
+    <div class="budget-summary">
+      <div class="summary-row"><span>予算目安</span><span class="val">${yen(totalMin)} 〜 ${yen(totalMax)}</span></div>
+      <div class="summary-row"><span>実支出（入力済 ${actualCount}件）</span><span class="val" style="color:${COLORS.accentDeep};">${yen(totalActual)}</span></div>
+    </div>
+    <p class="muted" style="margin:-6px 0 8px;">ハンドル「⠿」を長押しして並び替え</p>
+    <div class="list" id="budget-list">${rows}</div>
+    <button class="btn btn-primary" data-action="add-budget">+ 項目を追加</button>
+  `;
+}
+
+/* ====================== render: layout ====================== */
+function renderLayout(){
+  const editBtnStyle = state.layoutEdit ? `background:${COLORS.accent};color:#fff;` : `background:${COLORS.surfaceDeep};color:${COLORS.accentDeep};`;
+
+  const zoneBoxes = state.zones.map(z => `
+    <div class="zone-box ${state.layoutEdit?'editable':''}" data-zone-drag="${state.layoutEdit?z.id:''}"
+      style="top:${z.top}%; left:${z.left}%; width:${z.width}%; height:${z.height}%; background:${z.fill}; z-index:${z.z};">
+      <span class="zone-label">${esc(z.label)}</span>
+    </div>`).join("");
+
+  const furnitureBoxes = state.furniture.map(f => `
+    <div class="furniture-box" data-furniture-drag="${f.id}"
+      style="top:${f.top}%; left:${f.left}%; width:${f.width}%; height:${f.height}%; background:${f.color};">
+      <span>${esc(f.label)}</span>
+    </div>`).join("");
+
+  let editPanels = "";
+  if(state.layoutEdit){
+    const zoneCards = state.zones.map(z => `
+      <div class="edit-card">
+        <div class="row-top">
+          <input class="field" style="margin:0;" data-field="label" data-kind="zone" data-id="${z.id}" value="${esc(z.label)}" />
+          <button class="del-btn" data-action="delete-zone" data-id="${z.id}">✕</button>
+        </div>
+        <div class="grid4">
+          <label>上<input type="number" data-field="top" data-kind="zone" data-id="${z.id}" value="${z.top}" /></label>
+          <label>左<input type="number" data-field="left" data-kind="zone" data-id="${z.id}" value="${z.left}" /></label>
+          <label>幅<input type="number" data-field="width" data-kind="zone" data-id="${z.id}" value="${z.width}" /></label>
+          <label>高さ<input type="number" data-field="height" data-kind="zone" data-id="${z.id}" value="${z.height}" /></label>
+        </div>
+      </div>`).join("");
+
+    const furnitureCards = state.furniture.map(f => `
+      <div class="edit-card">
+        <div class="row-top">
+          <input class="field" style="margin:0;" data-field="label" data-kind="furniture" data-id="${f.id}" value="${esc(f.label)}" />
+          <button class="del-btn" data-action="delete-furniture" data-id="${f.id}">✕</button>
+        </div>
+        <div class="grid4">
+          <label>上<input type="number" data-field="top" data-kind="furniture" data-id="${f.id}" value="${f.top}" /></label>
+          <label>左<input type="number" data-field="left" data-kind="furniture" data-id="${f.id}" value="${f.left}" /></label>
+          <label>幅<input type="number" data-field="width" data-kind="furniture" data-id="${f.id}" value="${f.width}" /></label>
+          <label>高さ<input type="number" data-field="height" data-kind="furniture" data-id="${f.id}" value="${f.height}" /></label>
+        </div>
+        <div class="swatches">
+          ${SWATCHES.map(c=>`<span class="swatch ${c===f.color?'selected':''}" style="background:${c};" data-action="set-furniture-color" data-id="${f.id}" data-color="${c}"></span>`).join("")}
+        </div>
+      </div>`).join("");
+
+    editPanels = `
+      <div class="edit-section">
+        <p class="edit-section-title">部屋を編集</p>
+        ${zoneCards}
+        <button class="btn btn-primary" data-action="add-zone">+ 部屋を追加</button>
+      </div>
+      <div class="edit-section">
+        <p class="edit-section-title">家具を編集</p>
+        ${furnitureCards}
+        <button class="btn btn-primary" data-action="add-furniture">+ 家具を追加</button>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="layout-note">
+      <span class="muted">家具は常にドラッグで移動できます（簡易レイアウトです）</span>
+      <button class="edit-toggle" style="${editBtnStyle}" data-action="toggle-edit">${state.layoutEdit?'編集を終える':'間取りを編集'}</button>
+    </div>
+    <div class="compass"><span>上＝西</span><span>右＝北（入口）</span></div>
+    <div class="floor-plan" id="floor-plan">
+      ${zoneBoxes}
+      ${furnitureBoxes}
+      <div class="edge-label" style="left:2px;top:50%;transform:translateY(-50%) rotate(-90deg);transform-origin:left;">南（バルコニー）</div>
+      <div class="edge-label" style="bottom:2px;right:46%;">東</div>
+    </div>
+    ${editPanels}
+    <button class="btn btn-ghost reset-btn" data-action="reset-layout">初期レイアウトに戻す</button>
+  `;
+}
+
+/* ====================== export / import ====================== */
+function exportDataJSON(){
+  return JSON.stringify({ tasks:state.tasks, budget:state.budget, zones:state.zones, furniture:state.furniture }, null, 2);
+}
+function importDataJSON(jsonStr){
+  try{
+    const obj = JSON.parse(jsonStr);
+    if(Array.isArray(obj.tasks)) state.tasks = obj.tasks;
+    if(Array.isArray(obj.budget)) state.budget = obj.budget;
+    if(Array.isArray(obj.zones)) state.zones = obj.zones;
+    if(Array.isArray(obj.furniture)) state.furniture = obj.furniture;
+    saveNow(STORAGE_KEYS.tasks, state.tasks);
+    saveNow(STORAGE_KEYS.budget, state.budget);
+    saveNow(STORAGE_KEYS.zones, state.zones);
+    saveNow(STORAGE_KEYS.furniture, state.furniture);
+    render();
+    showToast("データを読み込みました", { autoHideMs:2000 });
+  }catch(e){
+    showToast("JSONの形式が正しくないようです", { autoHideMs:4000 });
+  }
+}
+
+function renderDataPanel(){
+  const toggleLabel = state.dataPanelOpen ? "▲ データの書き出し・読み込みを閉じる" : "▼ データの書き出し・読み込み";
+  const panel = state.dataPanelOpen ? `
+    <div class="panel" style="margin-top:8px;">
+      <p class="panel-title">書き出し（現在のデータをコピーして保管）</p>
+      <textarea class="field" id="export-area" rows="5" readonly>${esc(exportDataJSON())}</textarea>
+      <button class="btn btn-ghost" data-action="copy-export" style="margin-bottom:14px;">コピー</button>
+      <p class="panel-title">読み込み（書き出したJSONを貼り付けて上書き）</p>
+      <textarea class="field" id="import-area" rows="5" placeholder="ここにJSONを貼り付け"></textarea>
+      <button class="btn btn-primary" data-action="import-data">読み込む（現在のデータを上書き）</button>
+    </div>` : "";
+  return `<div class="data-panel-toggle"><button class="link-btn" data-action="toggle-data-panel">${toggleLabel}</button></div>${panel}`;
+}
+
+/* ====================== main render ====================== */
+function render(){
+  const app = document.getElementById("app");
+  if(!state.loaded){ app.innerHTML = `<div class="loading">読み込み中…</div>`; return; }
+  let body = "";
+  if(state.tab === "tasks") body = renderTasks();
+  else if(state.tab === "budget") body = renderBudget();
+  else body = renderLayout();
+  app.innerHTML = renderHeader() + body + renderDataPanel();
+  if(state.tab === "tasks") enableReorder(document.getElementById("task-list"), state.tasks, (ids)=>{
+    state.tasks = ids.map(id => state.tasks.find(t=>t.id===id));
+    saveNow(STORAGE_KEYS.tasks, state.tasks);
+  });
+  if(state.tab === "budget") enableReorder(document.getElementById("budget-list"), state.budget, (ids)=>{
+    state.budget = ids.map(id => state.budget.find(b=>b.id===id));
+    saveNow(STORAGE_KEYS.budget, state.budget);
+  });
+  if(state.tab === "layout") enableCanvasDrag();
+}
+
+/* ====================== reorder (drag handles) ====================== */
+function enableReorder(container, dataArrRefIgnored, onCommit){
+  if(!container) return;
+  let dragRow = null;
+  container.addEventListener("pointerdown", (e) => {
+    const handle = e.target.closest("[data-reorder-handle]");
+    if(!handle) return;
+    dragRow = handle.closest("[data-row]");
+    if(!dragRow) return;
+    dragRow.classList.add("dragging");
+    try{ dragRow.setPointerCapture(e.pointerId); }catch(_e){}
+  });
+  container.addEventListener("pointermove", (e) => {
+    if(!dragRow) return;
+    const rows = Array.from(container.querySelectorAll("[data-row]"));
+    for(const row of rows){
+      if(row === dragRow) continue;
+      const rect = row.getBoundingClientRect();
+      const mid = rect.top + rect.height/2;
+      const dragFollows = dragRow.compareDocumentPosition(row) & Node.DOCUMENT_POSITION_FOLLOWING;
+      if(e.clientY < mid && dragFollows){ container.insertBefore(dragRow, row); break; }
+      if(e.clientY > mid && !dragFollows){ container.insertBefore(dragRow, row.nextSibling); break; }
+    }
+  });
+  const finish = (e) => {
+    if(!dragRow) return;
+    dragRow.classList.remove("dragging");
+    try{ dragRow.releasePointerCapture(e.pointerId); }catch(_e){}
+    const ids = Array.from(container.querySelectorAll("[data-row]")).map(r=>r.dataset.id);
+    dragRow = null;
+    onCommit(ids);
+  };
+  container.addEventListener("pointerup", finish);
+  container.addEventListener("pointercancel", finish);
+}
+
+/* ====================== canvas drag (zones + furniture move) ====================== */
+function enableCanvasDrag(){
+  const plan = document.getElementById("floor-plan");
+  if(!plan) return;
+  let drag = null; // { kind, id, el }
+
+  const start = (e, kind, id, el) => {
+    e.preventDefault();
+    try{ el.setPointerCapture(e.pointerId); }catch(_e){}
+    drag = { kind, id, el };
+  };
+
+  plan.querySelectorAll("[data-zone-drag]").forEach(el => {
+    const id = el.getAttribute("data-zone-drag");
+    if(!id) return;
+    el.addEventListener("pointerdown", (e) => start(e, "zone", id, el));
+  });
+  plan.querySelectorAll("[data-furniture-drag]").forEach(el => {
+    const id = el.getAttribute("data-furniture-drag");
+    el.addEventListener("pointerdown", (e) => start(e, "furniture", id, el));
+  });
+
+  plan.addEventListener("pointermove", (e) => {
+    if(!drag) return;
+    const rect = plan.getBoundingClientRect();
+    const list = drag.kind === "zone" ? state.zones : state.furniture;
+    const item = list.find(x=>x.id===drag.id);
+    if(!item) return;
+    let leftPct = ((e.clientX - rect.left)/rect.width)*100 - item.width/2;
+    let topPct = ((e.clientY - rect.top)/rect.height)*100 - item.height/2;
+    leftPct = clampNum(leftPct, 0, 100-item.width);
+    topPct = clampNum(topPct, 0, 100-item.height);
+    drag.el.style.left = leftPct + "%";
+    drag.el.style.top = topPct + "%";
+    drag._live = { top:topPct, left:leftPct };
+  });
+
+  const finish = (e) => {
+    if(!drag) return;
+    if(drag._live){
+      const list = drag.kind === "zone" ? state.zones : state.furniture;
+      const item = list.find(x=>x.id===drag.id);
+      if(item){ item.top = drag._live.top; item.left = drag._live.left; }
+      const key = drag.kind === "zone" ? STORAGE_KEYS.zones : STORAGE_KEYS.furniture;
+      saveNow(key, list);
+    }
+    try{ drag.el.releasePointerCapture(e.pointerId); }catch(_e){}
+    drag = null;
+  };
+  plan.addEventListener("pointerup", finish);
+  plan.addEventListener("pointercancel", finish);
+}
+
+/* ====================== event delegation (clicks / inputs) ====================== */
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-action]");
+  if(!btn) return;
+  const action = btn.dataset.action;
+  const id = btn.dataset.id;
+
+  if(action === "set-tab"){ state.tab = btn.dataset.tab; render(); }
+
+  else if(action === "delete-task"){ state.tasks = state.tasks.filter(t=>t.id!==id); saveNow(STORAGE_KEYS.tasks, state.tasks); render(); }
+  else if(action === "add-task"){
+    const titleEl = document.getElementById("new-task-title");
+    const catEl = document.getElementById("new-task-category");
+    const dueEl = document.getElementById("new-task-due");
+    const title = titleEl.value.trim();
+    if(!title) return;
+    state.tasks.push({ id:uid("t"), title, category:catEl.value, due: dueEl.value || null, done:false });
+    saveNow(STORAGE_KEYS.tasks, state.tasks);
+    render();
+  }
+
+  else if(action === "delete-budget"){ state.budget = state.budget.filter(b=>b.id!==id); saveNow(STORAGE_KEYS.budget, state.budget); render(); }
+  else if(action === "add-budget"){
+    state.budget.push({ id:uid("b"), category:"その他", item:"新しい項目", min:0, max:0, actual:null, status:"未購入" });
+    saveNow(STORAGE_KEYS.budget, state.budget);
+    render();
+  }
+
+  else if(action === "toggle-edit"){ state.layoutEdit = !state.layoutEdit; render(); }
+  else if(action === "reset-layout"){ state.zones = JSON.parse(JSON.stringify(DEFAULT_ZONES)); state.furniture = JSON.parse(JSON.stringify(DEFAULT_FURNITURE)); saveNow(STORAGE_KEYS.zones, state.zones); saveNow(STORAGE_KEYS.furniture, state.furniture); render(); }
+  else if(action === "delete-zone"){ state.zones = state.zones.filter(z=>z.id!==id); saveNow(STORAGE_KEYS.zones, state.zones); render(); }
+  else if(action === "add-zone"){
+    state.zones.push({ id:uid("z"), label:"新しい部屋", top:30, left:30, width:20, height:15, fill:COLORS.surface, z:0 });
+    saveNow(STORAGE_KEYS.zones, state.zones);
+    render();
+  }
+  else if(action === "delete-furniture"){ state.furniture = state.furniture.filter(f=>f.id!==id); saveNow(STORAGE_KEYS.furniture, state.furniture); render(); }
+  else if(action === "add-furniture"){
+    state.furniture.push({ id:uid("f"), label:"新しい家具", top:20, left:20, width:15, height:8, color:COLORS.accent });
+    saveNow(STORAGE_KEYS.furniture, state.furniture);
+    render();
+  }
+  else if(action === "set-furniture-color"){
+    const f = state.furniture.find(x=>x.id===id);
+    if(f){ f.color = btn.dataset.color; saveNow(STORAGE_KEYS.furniture, state.furniture); render(); }
+  }
+
+  else if(action === "toggle-data-panel"){ state.dataPanelOpen = !state.dataPanelOpen; render(); }
+  else if(action === "copy-export"){
+    const ta = document.getElementById("export-area");
+    if(!ta) return;
+    ta.focus(); ta.select();
+    try{ document.execCommand("copy"); showToast("コピーしました", { autoHideMs:1500 }); }
+    catch(_e){ showToast("コピーできませんでした。手動で全選択してコピーしてください", { autoHideMs:3500 }); }
+  }
+  else if(action === "import-data"){
+    const ta = document.getElementById("import-area");
+    if(ta) importDataJSON(ta.value);
+  }
+});
+
+document.addEventListener("change", (e) => {
+  const t = e.target;
+  if(t.id === "task-noop") return;
+  if(t.dataset && t.dataset.action === "toggle-task"){
+    const task = state.tasks.find(x=>x.id===t.dataset.id);
+    if(task){ task.done = t.checked; saveNow(STORAGE_KEYS.tasks, state.tasks); render(); }
+    return;
+  }
+  if(t.dataset && t.dataset.field && t.dataset.id && !t.dataset.kind){
+    // budget field changes (status select triggers 'change'; number/text use 'input' below but also fires change)
+    const b = state.budget.find(x=>x.id===t.dataset.id);
+    if(b){
+      const f = t.dataset.field;
+      if(f === "status") b.status = t.value;
+      saveNow(STORAGE_KEYS.budget, state.budget);
+      if(f === "status") render();
+    }
+  }
+});
+
+document.addEventListener("input", (e) => {
+  const t = e.target;
+  if(!t.dataset) return;
+  const id = t.dataset.id, field = t.dataset.field, kind = t.dataset.kind;
+  if(!field || !id) return;
+
+  if(kind === "zone"){
+    const z = state.zones.find(x=>x.id===id);
+    if(!z) return;
+    if(field === "label"){
+      z.label = t.value;
+      const lbl = document.querySelector(`[data-zone-drag="${id}"] .zone-label`);
+      if(lbl) lbl.textContent = t.value;
+    } else {
+      z[field] = clampNum(Number(t.value)||0, 0, 100);
+      const box = document.querySelector(`[data-zone-drag="${id}"]`);
+      if(box) box.style[field] = z[field] + "%";
+    }
+    debSave(STORAGE_KEYS.zones, state.zones);
+    return;
+  }
+  if(kind === "furniture"){
+    const f = state.furniture.find(x=>x.id===id);
+    if(!f) return;
+    if(field === "label"){
+      f.label = t.value;
+      const span = document.querySelector(`[data-furniture-drag="${id}"] span`);
+      if(span) span.textContent = t.value;
+    } else {
+      f[field] = clampNum(Number(t.value)||0, 0, 100);
+      const box = document.querySelector(`[data-furniture-drag="${id}"]`);
+      if(box) box.style[field] = f[field] + "%";
+    }
+    debSave(STORAGE_KEYS.furniture, state.furniture);
+    return;
+  }
+
+  // budget fields (no kind)
+  const b = state.budget.find(x=>x.id===id);
+  if(!b) return;
+  if(field === "category" || field === "item"){ b[field] = t.value; }
+  else if(field === "min" || field === "max"){ b[field] = t.value === "" ? 0 : Number(t.value); updateBudgetTotals(); }
+  else if(field === "actual"){ b.actual = t.value === "" ? null : Number(t.value); updateBudgetTotals(); }
+  debSave(STORAGE_KEYS.budget, state.budget);
+});
+
+function updateBudgetTotals(){
+  const wrap = document.querySelector(".budget-summary");
+  if(!wrap) return;
+  const totalMin = state.budget.reduce((s,b)=>s+(Number(b.min)||0),0);
+  const totalMax = state.budget.reduce((s,b)=>s+(Number(b.max)||0),0);
+  const totalActual = state.budget.reduce((s,b)=>s+(Number(b.actual)||0),0);
+  const actualCount = state.budget.filter(b=>b.actual!=null && b.actual!=="").length;
+  const rows = wrap.querySelectorAll(".summary-row .val");
+  if(rows[0]) rows[0].textContent = `${yen(totalMin)} 〜 ${yen(totalMax)}`;
+  if(rows[1]) rows[1].textContent = yen(totalActual);
+  const label = wrap.querySelectorAll(".summary-row span:first-child")[1];
+  if(label) label.textContent = `実支出（入力済 ${actualCount}件）`;
+}
+
+/* ====================== init ====================== */
+(async function init(){
+  render();
+  await loadAll();
+  render();
+})();
+</script>
+</body>
+</html>
