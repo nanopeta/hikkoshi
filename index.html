@@ -170,14 +170,11 @@ const INITIAL_COST_ITEM = {
 };
 
 const DEFAULT_ZONES = [
-  { id:"z1", label:"LDK", top:42, left:8, width:76, height:58, fill:COLORS.surface, z:0 },
-  { id:"z2", label:"洋室 4.3帖", top:0, left:8, width:47, height:40, fill:COLORS.surfaceDeep, z:0 },
-  { id:"z3", label:"WIC", top:4, left:57, width:14, height:18, fill:"#E6DFD2", z:1 },
-  { id:"z4", label:"キッチン", top:46, left:58, width:24, height:13, fill:"#E7CFC9", z:1 },
-  { id:"z5", label:"浴室", top:61, left:84, width:14, height:15, fill:"#D6DEE6", z:1 },
-  { id:"z6", label:"トイレ", top:78, left:84, width:14, height:15, fill:"#EBD6E0", z:1 },
-  { id:"z7", label:"玄関・廊下", top:0, left:84, width:14, height:40, fill:"#E9DCD6", z:1 },
-  { id:"z8", label:"バルコニー", top:42, left:0, width:7, height:58, fill:"#DCE7DC", z:1 },
+  { id:"z1", label:"LDK",       top:50, left:10, width:90, height:50, fill:"#EEF0F2", z:0 },
+  { id:"z2", label:"洋室 4.3帖", top:0,  left:10, width:50, height:50, fill:"#E2E5E9", z:0 },
+  { id:"z3", label:"WIC",       top:0,  left:60, width:20, height:50, fill:"#E6DFD2", z:1 },
+  { id:"z4", label:"キッチン",   top:0,  left:80, width:20, height:50, fill:"#E7CFC9", z:1 },
+  { id:"z8", label:"バルコニー", top:0,  left:0,  width:10, height:100, fill:"#DCE7DC", z:1 },
 ];
 
 const DEFAULT_FURNITURE = [
@@ -454,9 +451,7 @@ function renderLayout(){
           <input class="field" style="margin:0;" data-field="label" data-kind="furniture" data-id="${f.id}" value="${esc(f.label)}" />
           <button class="del-btn" data-action="delete-furniture" data-id="${f.id}">✕</button>
         </div>
-        <div class="grid4">
-          <label>上<input type="number" data-field="top" data-kind="furniture" data-id="${f.id}" value="${f.top}" /></label>
-          <label>左<input type="number" data-field="left" data-kind="furniture" data-id="${f.id}" value="${f.left}" /></label>
+        <div class="grid4" style="grid-template-columns:repeat(2,1fr);">
           <label>幅<input type="number" data-field="width" data-kind="furniture" data-id="${f.id}" value="${f.width}" /></label>
           <label>高さ<input type="number" data-field="height" data-kind="furniture" data-id="${f.id}" value="${f.height}" /></label>
         </div>
