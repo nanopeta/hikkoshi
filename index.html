@@ -81,9 +81,9 @@
   .compass{ display:flex; justify-content:space-between; font-size:11px; color:var(--text-soft); padding:0 4px; margin-bottom:4px; }
   .floor-plan{ position:relative; width:100%; padding-top:100%; border:1px solid var(--line); border-radius:12px; background:var(--base); overflow:hidden; touch-action:none; user-select:none; }
   .zone-box, .furniture-box{ position:absolute; }
-  .zone-box{ display:flex; align-items:flex-start; padding:4px; border:1px solid var(--line); }
+  .zone-box{ display:flex; align-items:center; justify-content:center; padding:4px; border:1px solid var(--line); }
   .zone-box.editable{ border-color:var(--accent); cursor:grab; }
-  .zone-label{ font-size:10px; line-height:1.2; color:var(--text-soft); }
+  .zone-label{ font-size:9px; line-height:1.3; color:var(--text-soft); text-align:center; word-break:break-all; }
   .furniture-box{ display:flex; align-items:center; justify-content:center; text-align:center; border-radius:6px; box-shadow:0 2px 4px rgba(0,0,0,.15); cursor:grab; z-index:10; }
   .furniture-box span{ font-size:10px; color:#fff; padding:0 2px; line-height:1.2; }
   .edge-label{ position:absolute; font-size:10px; color:var(--text-soft); }
@@ -101,6 +101,17 @@
   .reset-btn{ margin-top:12px; }
   .loading{ text-align:center; padding:40px 0; color:var(--text-soft); font-size:13px; }
 
+  .progress-wrap{ height:4px; background:var(--surface-deep); border-radius:2px; margin-bottom:12px; overflow:hidden; }
+  .progress-fill{ height:100%; background:var(--done); border-radius:2px; transition:width .3s ease; }
+
+  .filter-chips{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+  .filter-chip{ font-size:11px; padding:4px 10px; border-radius:20px; border:1px solid var(--line); background:var(--base); color:var(--text-soft); cursor:pointer; white-space:nowrap; font-weight:500; }
+  .filter-chip.active{ background:var(--accent-deep); color:#fff; border-color:var(--accent-deep); }
+
+  .furniture-legend{ display:flex; flex-wrap:wrap; gap:8px 14px; margin-top:10px; padding:10px 12px; background:var(--surface); border-radius:10px; }
+  .legend-item{ display:flex; align-items:center; gap:5px; font-size:11px; color:var(--text-soft); }
+  .legend-dot{ width:10px; height:10px; border-radius:3px; flex-shrink:0; }
+
   .save-toast{ position:fixed; left:50%; bottom:18px; transform:translateX(-50%) translateY(16px); background:var(--text); color:#fff; padding:10px 14px; border-radius:12px; font-size:12px; display:flex; align-items:center; gap:10px; opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease; max-width:88%; z-index:1000; box-shadow:0 6px 16px rgba(0,0,0,.25); }
   .save-toast.show{ opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto; }
   .save-toast button{ background:var(--accent); color:#fff; border:none; padding:6px 10px; border-radius:8px; font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap; flex-shrink:0; }
@@ -108,6 +119,14 @@
   .data-panel-toggle{ text-align:center; margin-top:18px; }
   .link-btn{ background:none; border:none; color:var(--text-soft); font-size:12px; cursor:pointer; padding:6px; }
   textarea.field{ font-family: ui-monospace, 'SF Mono', Consolas, monospace; font-size:11px; resize:vertical; }
+
+  .info-section{ background:var(--base); border:1px solid var(--line); border-radius:12px; padding:12px; margin-bottom:10px; }
+  .info-section-title{ font-size:11px; font-weight:700; color:var(--accent-deep); letter-spacing:.08em; margin:0 0 10px; }
+  .info-row{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .info-row:last-child{ margin-bottom:0; }
+  .info-label{ font-size:12px; color:var(--text-soft); white-space:nowrap; min-width:84px; }
+  .info-input{ flex:1; min-width:0; font-size:13px; padding:7px 8px; border-radius:8px; border:1px solid var(--line); background:var(--surface); outline:none; color:var(--text); }
+  .info-textarea{ width:100%; font-size:13px; padding:7px 8px; border-radius:8px; border:1px solid var(--line); background:var(--surface); outline:none; color:var(--text); resize:vertical; min-height:72px; margin-top:2px; }
 </style>
 </head>
 <body>
@@ -121,9 +140,18 @@ const COLORS = {
   text:"#2C2F33", textSoft:"#6B7076", danger:"#C16456", warn:"#BD8A45", done:"#7E9A82", line:"#DADDE1",
 };
 
-const STORAGE_KEYS = { tasks:"movehub-tasks-v1", budget:"movehub-budget-v1", furniture:"movehub-furniture-v1", zones:"movehub-zones-v1" };
+const STORAGE_KEYS = { tasks:"movehub-tasks-v1", budget:"movehub-budget-v1", furniture:"movehub-furniture-v1", zones:"movehub-zones-v1", planSize:"movehub-plansize-v1", info:"movehub-info-v1" };
 
 /* ====================== default data ====================== */
+const DEFAULT_INFO = {
+  address: "", moveInDate: "2026-06-24", floorPlan: "", rent: "", managementFee: "",
+  electricCompany: "", electricNo: "", electricOpenDate: "",
+  gasCompany: "西部ガス", gasPhone: "093-471-7314", gasNo: "", gasOpenDate: "",
+  waterNo: "",
+  internetProvider: "", internetType: "", internetOpenDate: "",
+  agentName: "", agentPhone: "", agentPerson: "",
+  memo: "",
+};
 const DEFAULT_TASKS = [
   { id:"t1", title:"ガス開栓予約の電話（093-471-7314）", category:"ライフライン", due:"2026-06-23", done:false },
   { id:"t2", title:"火災保険 付保証明書PDF提出", category:"契約", due:"2026-06-24", done:false },
@@ -178,17 +206,17 @@ const DEFAULT_ZONES = [
 ];
 
 const DEFAULT_FURNITURE = [
-  { id:"f1", label:"ベッド", top:46, left:11, width:34, height:11, color:COLORS.accent },
-  { id:"f2", label:"デスク(FlexiSpot)", top:6, left:12, width:19, height:9, color:COLORS.beige },
-  { id:"f3", label:"モニター", top:5, left:32, width:7, height:6, color:COLORS.gray },
-  { id:"f4", label:"ローテーブル", top:70, left:38, width:17, height:9, color:COLORS.beige },
-  { id:"f5", label:"プロジェクター画面(東壁)", top:96, left:32, width:30, height:4, color:COLORS.accentDeep },
+  { id:"f1", label:"ベッド",               top:46, left:11, width:34, height:11, color:COLORS.accent,    rotate:0, shape:"rect" },
+  { id:"f2", label:"デスク(FlexiSpot)",    top:6,  left:12, width:19, height:9,  color:COLORS.beige,     rotate:0, shape:"rect" },
+  { id:"f3", label:"モニター",             top:5,  left:32, width:7,  height:6,  color:COLORS.gray,      rotate:0, shape:"rect" },
+  { id:"f4", label:"ローテーブル",         top:70, left:38, width:17, height:9,  color:COLORS.beige,     rotate:0, shape:"rect" },
+  { id:"f5", label:"プロジェクター画面(東壁)", top:96, left:32, width:30, height:4,  color:COLORS.accentDeep, rotate:0, shape:"rect" },
 ];
 
 const SWATCHES = [COLORS.accent, COLORS.accentDeep, COLORS.beige, COLORS.gray, COLORS.danger, COLORS.done];
 
 /* ====================== state ====================== */
-const state = { tab:"tasks", tasks:[], budget:[], zones:[], furniture:[], layoutEdit:false, dataPanelOpen:false, loaded:false };
+const state = { tab:"tasks", tasks:[], budget:[], zones:[], furniture:[], info:{}, layoutEdit:false, dataPanelOpen:false, loaded:false, taskFilter:null, planWidth:5000, planHeight:5000 };
 const saveTimers = {};
 
 function showToast(message, opts={}){
@@ -249,6 +277,10 @@ async function loadAll(){
   state.budget = await loadKey(STORAGE_KEYS.budget, DEFAULT_BUDGET);
   state.zones = await loadKey(STORAGE_KEYS.zones, DEFAULT_ZONES);
   state.furniture = await loadKey(STORAGE_KEYS.furniture, DEFAULT_FURNITURE);
+  const planSize = await loadKey(STORAGE_KEYS.planSize, {w:5000, h:5000});
+  state.planWidth = planSize.w || 5000;
+  state.planHeight = planSize.h || 5000;
+  state.info = await loadKey(STORAGE_KEYS.info, DEFAULT_INFO);
 
   // 初期費用(物件)を1項目にまとめる
   const breakdownIds = ["b15","b16","b17","b18","b19","b20","b21","b22","b23","b24"];
@@ -273,6 +305,8 @@ const uid = (p) => `${p}${Date.now()}_${Math.random().toString(36).slice(2,6)}`;
 const yen = (n) => (n === null || n === undefined || n === "" ? "-" : `¥${Number(n).toLocaleString()}`);
 const clampNum = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const esc = (s) => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const pctToMm = (pct, axis) => Math.round(pct / 100 * (axis === 'x' ? state.planWidth : state.planHeight));
+const mmToPct = (mm, axis) => mm / (axis === 'x' ? state.planWidth : state.planHeight) * 100;
 
 function daysUntil(dateStr){
   if(!dateStr) return null;
@@ -324,20 +358,34 @@ function renderHeader(){
       <button class="tab-btn ${state.tab==='tasks'?'active':''}" data-action="set-tab" data-tab="tasks">やること</button>
       <button class="tab-btn ${state.tab==='budget'?'active':''}" data-action="set-tab" data-tab="budget">予算</button>
       <button class="tab-btn ${state.tab==='layout'?'active':''}" data-action="set-tab" data-tab="layout">レイアウト</button>
+      <button class="tab-btn ${state.tab==='info'?'active':''}" data-action="set-tab" data-tab="info">基本情報</button>
     </div>
   `;
 }
 
 /* ====================== render: tasks ====================== */
 function renderTasks(){
-  const remaining = state.tasks.filter(t=>!t.done).length;
-  const rows = state.tasks.map(t => {
+  const total = state.tasks.length;
+  const doneCount = state.tasks.filter(t=>t.done).length;
+  const pct = total > 0 ? Math.round(doneCount / total * 100) : 0;
+
+  const categories = [...new Set(state.tasks.map(t=>t.category))];
+  const filtered = state.taskFilter ? state.tasks.filter(t=>t.category===state.taskFilter) : state.tasks;
+  const remaining = filtered.filter(t=>!t.done).length;
+
+  const filterChips = `<div class="filter-chips">
+    <button class="filter-chip ${!state.taskFilter?'active':''}" data-action="set-task-filter" data-filter="">すべて</button>
+    ${categories.map(c=>`<button class="filter-chip ${state.taskFilter===c?'active':''}" data-action="set-task-filter" data-filter="${esc(c)}">${esc(c)}</button>`).join("")}
+  </div>`;
+
+  const rows = filtered.map(t => {
     const badge = dueBadge(t.due);
     const dueChip = (!t.done && t.due) ? `<span class="chip" style="background:${badge.bg};color:${badge.color};font-weight:600;">${badge.text}（${t.due.slice(5)}）</span>` :
                     (!t.done && !t.due) ? `<span class="chip">期限なし</span>` : "";
+    const handle = state.taskFilter ? '' : '<span class="reorder-handle" data-reorder-handle>⠿</span>';
     return `
       <div class="list-row ${t.done?'done-row':''}" data-row data-id="${t.id}">
-        <span class="reorder-handle" data-reorder-handle>⠿</span>
+        ${handle}
         <input type="checkbox" data-action="toggle-task" data-id="${t.id}" ${t.done?'checked':''} />
         <div class="row-main">
           <p class="task-title ${t.done?'done':''}">${esc(t.title)}</p>
@@ -352,8 +400,11 @@ function renderTasks(){
 
   return `
     <div class="toprow">
-      <span class="muted">残り ${remaining} 件 ／ ハンドル「⠿」を長押しして並び替え</span>
+      <span class="muted">残り ${remaining} 件${state.taskFilter ? '（フィルター中）' : ` ／ 全 ${total} 件`}</span>
+      <span class="muted">${pct}% 完了</span>
     </div>
+    <div class="progress-wrap"><div class="progress-fill" style="width:${pct}%;"></div></div>
+    ${filterChips}
     <div class="list" id="task-list">${rows || '<p class="muted" style="text-align:center;padding:24px 0;">タスクはありません</p>'}</div>
     <div class="panel">
       <p class="panel-title">タスクを追加</p>
@@ -413,6 +464,57 @@ function renderBudget(){
   `;
 }
 
+/* ====================== render: info ====================== */
+function renderInfo(){
+  const v = state.info;
+  const f = (key, type="text", placeholder="") =>
+    `<input class="info-input" type="${type}" data-info-field="${key}" value="${esc(v[key]??'')}" placeholder="${esc(placeholder)}" />`;
+
+  return `
+    <div class="info-section">
+      <p class="info-section-title">物件</p>
+      <div class="info-row"><span class="info-label">住所</span>${f('address','text','北九州市小倉北区…')}</div>
+      <div class="info-row"><span class="info-label">入居日</span>${f('moveInDate','date')}</div>
+      <div class="info-row"><span class="info-label">間取り</span>${f('floorPlan','text','1LDK など')}</div>
+      <div class="info-row"><span class="info-label">家賃</span>${f('rent','text','¥000,000 / 月')}</div>
+      <div class="info-row"><span class="info-label">管理費</span>${f('managementFee','text','¥0,000 / 月')}</div>
+    </div>
+    <div class="info-section">
+      <p class="info-section-title">電気</p>
+      <div class="info-row"><span class="info-label">電力会社</span>${f('electricCompany','text','九州電力 など')}</div>
+      <div class="info-row"><span class="info-label">お客様番号</span>${f('electricNo','text')}</div>
+      <div class="info-row"><span class="info-label">開通日</span>${f('electricOpenDate','date')}</div>
+    </div>
+    <div class="info-section">
+      <p class="info-section-title">ガス</p>
+      <div class="info-row"><span class="info-label">ガス会社</span>${f('gasCompany','text','西部ガス など')}</div>
+      <div class="info-row"><span class="info-label">電話番号</span>${f('gasPhone','tel')}</div>
+      <div class="info-row"><span class="info-label">お客様番号</span>${f('gasNo','text')}</div>
+      <div class="info-row"><span class="info-label">開栓日</span>${f('gasOpenDate','date')}</div>
+    </div>
+    <div class="info-section">
+      <p class="info-section-title">水道</p>
+      <div class="info-row"><span class="info-label">お客様番号</span>${f('waterNo','text')}</div>
+    </div>
+    <div class="info-section">
+      <p class="info-section-title">インターネット</p>
+      <div class="info-row"><span class="info-label">プロバイダ</span>${f('internetProvider','text','NURO / ドコモ光 など')}</div>
+      <div class="info-row"><span class="info-label">種別</span>${f('internetType','text','光ファイバー など')}</div>
+      <div class="info-row"><span class="info-label">開通予定日</span>${f('internetOpenDate','date')}</div>
+    </div>
+    <div class="info-section">
+      <p class="info-section-title">不動産・管理会社</p>
+      <div class="info-row"><span class="info-label">会社名</span>${f('agentName','text')}</div>
+      <div class="info-row"><span class="info-label">電話番号</span>${f('agentPhone','tel')}</div>
+      <div class="info-row"><span class="info-label">担当者</span>${f('agentPerson','text')}</div>
+    </div>
+    <div class="info-section">
+      <p class="info-section-title">メモ</p>
+      <textarea class="info-textarea" data-info-field="memo" placeholder="その他の覚え書き…">${esc(v.memo??'')}</textarea>
+    </div>
+  `;
+}
+
 /* ====================== render: layout ====================== */
 function renderLayout(){
   const editBtnStyle = state.layoutEdit ? `background:${COLORS.accent};color:#fff;` : `background:${COLORS.surfaceDeep};color:${COLORS.accentDeep};`;
@@ -425,7 +527,7 @@ function renderLayout(){
 
   const furnitureBoxes = state.furniture.map(f => `
     <div class="furniture-box" data-furniture-drag="${f.id}"
-      style="top:${f.top}%; left:${f.left}%; width:${f.width}%; height:${f.height}%; background:${f.color};">
+      style="top:${f.top}%; left:${f.left}%; width:${f.width}%; height:${f.height}%; background:${f.color}; transform:rotate(${f.rotate||0}deg); border-radius:${f.shape==='circle'?'50%':'6px'};">
       <span>${esc(f.label)}</span>
     </div>`).join("");
 
@@ -438,10 +540,10 @@ function renderLayout(){
           <button class="del-btn" data-action="delete-zone" data-id="${z.id}">✕</button>
         </div>
         <div class="grid4">
-          <label>上<input type="number" data-field="top" data-kind="zone" data-id="${z.id}" value="${z.top}" /></label>
-          <label>左<input type="number" data-field="left" data-kind="zone" data-id="${z.id}" value="${z.left}" /></label>
-          <label>幅<input type="number" data-field="width" data-kind="zone" data-id="${z.id}" value="${z.width}" /></label>
-          <label>高さ<input type="number" data-field="height" data-kind="zone" data-id="${z.id}" value="${z.height}" /></label>
+          <label>上 mm<input type="number" data-field="top" data-kind="zone" data-id="${z.id}" value="${pctToMm(z.top,'y')}" /></label>
+          <label>左 mm<input type="number" data-field="left" data-kind="zone" data-id="${z.id}" value="${pctToMm(z.left,'x')}" /></label>
+          <label>幅 mm<input type="number" data-field="width" data-kind="zone" data-id="${z.id}" value="${pctToMm(z.width,'x')}" /></label>
+          <label>高さ mm<input type="number" data-field="height" data-kind="zone" data-id="${z.id}" value="${pctToMm(z.height,'y')}" /></label>
         </div>
       </div>`).join("");
 
@@ -449,11 +551,13 @@ function renderLayout(){
       <div class="edit-card">
         <div class="row-top">
           <input class="field" style="margin:0;" data-field="label" data-kind="furniture" data-id="${f.id}" value="${esc(f.label)}" />
+          <button class="del-btn" data-action="set-furniture-shape" data-id="${f.id}" data-shape="${f.shape==='circle'?'rect':'circle'}" title="形状切替" style="color:var(--accent);font-size:15px;">${f.shape==='circle'?'○':'□'}</button>
+          <button class="del-btn" data-action="rotate-furniture" data-id="${f.id}" title="90°回転" style="color:var(--accent);font-size:15px;">↻${f.rotate||0}°</button>
           <button class="del-btn" data-action="delete-furniture" data-id="${f.id}">✕</button>
         </div>
         <div class="grid4" style="grid-template-columns:repeat(2,1fr);">
-          <label>幅<input type="number" data-field="width" data-kind="furniture" data-id="${f.id}" value="${f.width}" /></label>
-          <label>高さ<input type="number" data-field="height" data-kind="furniture" data-id="${f.id}" value="${f.height}" /></label>
+          <label>幅 mm<input type="number" data-field="width" data-kind="furniture" data-id="${f.id}" value="${pctToMm(f.width,'x')}" /></label>
+          <label>高さ mm<input type="number" data-field="height" data-kind="furniture" data-id="${f.id}" value="${pctToMm(f.height,'y')}" /></label>
         </div>
         <div class="swatches">
           ${SWATCHES.map(c=>`<span class="swatch ${c===f.color?'selected':''}" style="background:${c};" data-action="set-furniture-color" data-id="${f.id}" data-color="${c}"></span>`).join("")}
@@ -461,6 +565,14 @@ function renderLayout(){
       </div>`).join("");
 
     editPanels = `
+      <div class="edit-section">
+        <p class="edit-section-title">フロアプランの実寸</p>
+        <div class="grid4" style="grid-template-columns:repeat(2,1fr);margin-bottom:8px;">
+          <label>横幅 mm<input class="grid4 input" type="number" id="plan-w" value="${state.planWidth}" /></label>
+          <label>奥行き mm<input class="grid4 input" type="number" id="plan-h" value="${state.planHeight}" /></label>
+        </div>
+        <button class="btn btn-ghost" data-action="apply-plan-size">実寸を適用</button>
+      </div>
       <div class="edit-section">
         <p class="edit-section-title">部屋を編集</p>
         ${zoneCards}
@@ -474,9 +586,13 @@ function renderLayout(){
     `;
   }
 
+  const legend = `<div class="furniture-legend">
+    ${state.furniture.map(f=>`<div class="legend-item"><span class="legend-dot" style="background:${f.color};"></span><span>${esc(f.label)}</span></div>`).join("")}
+  </div>`;
+
   return `
     <div class="layout-note">
-      <span class="muted">家具は常にドラッグで移動できます（簡易レイアウトです）</span>
+      <span class="muted">家具はいつでもドラッグ可能</span>
       <button class="edit-toggle" style="${editBtnStyle}" data-action="toggle-edit">${state.layoutEdit?'編集を終える':'間取りを編集'}</button>
     </div>
     <div class="compass"><span>上＝西</span><span>右＝北（入口）</span></div>
@@ -486,6 +602,7 @@ function renderLayout(){
       <div class="edge-label" style="left:2px;top:50%;transform:translateY(-50%) rotate(-90deg);transform-origin:left;">南（バルコニー）</div>
       <div class="edge-label" style="bottom:2px;right:46%;">東</div>
     </div>
+    ${legend}
     ${editPanels}
     <button class="btn btn-ghost reset-btn" data-action="reset-layout">初期レイアウトに戻す</button>
   `;
@@ -534,6 +651,7 @@ function render(){
   let body = "";
   if(state.tab === "tasks") body = renderTasks();
   else if(state.tab === "budget") body = renderBudget();
+  else if(state.tab === "info") body = renderInfo();
   else body = renderLayout();
   app.innerHTML = renderHeader() + body + renderDataPanel();
   if(state.tab === "tasks") enableReorder(document.getElementById("task-list"), state.tasks, (ids)=>{
@@ -554,6 +672,7 @@ function enableReorder(container, dataArrRefIgnored, onCommit){
   container.addEventListener("pointerdown", (e) => {
     const handle = e.target.closest("[data-reorder-handle]");
     if(!handle) return;
+    e.preventDefault();
     dragRow = handle.closest("[data-row]");
     if(!dragRow) return;
     dragRow.classList.add("dragging");
@@ -581,6 +700,35 @@ function enableReorder(container, dataArrRefIgnored, onCommit){
   };
   container.addEventListener("pointerup", finish);
   container.addEventListener("pointercancel", finish);
+}
+
+/* ====================== snap helper ====================== */
+const SNAP_THRESHOLD = 3; // % of canvas
+
+function snapToEdges(item, others, rawLeft, rawTop){
+  const rR = rawLeft + item.width, rB = rawTop + item.height;
+  let bL = rawLeft, bT = rawTop, mDx = SNAP_THRESHOLD, mDy = SNAP_THRESHOLD;
+
+  const tryX = (delta, result) => { const d = Math.abs(delta); if(d < mDx){ mDx = d; bL = result; } };
+  const tryY = (delta, result) => { const d = Math.abs(delta); if(d < mDy){ mDy = d; bT = result; } };
+
+  // canvas edges
+  tryX(rawLeft,    0);                    tryX(rR - 100, 100 - item.width);
+  tryY(rawTop,     0);                    tryY(rB - 100, 100 - item.height);
+
+  for(const o of others){
+    if(o.id === item.id) continue;
+    const oL = o.left, oR = o.left + o.width, oT = o.top, oB = o.top + o.height;
+    tryX(rawLeft - oR, oR);               tryX(rawLeft - oL, oL);
+    tryX(rR - oL, oL - item.width);       tryX(rR - oR, oR - item.width);
+    tryY(rawTop  - oB, oB);               tryY(rawTop  - oT, oT);
+    tryY(rB - oT, oT - item.height);      tryY(rB - oB, oB - item.height);
+  }
+
+  return {
+    left: clampNum(bL, 0, 100 - item.width),
+    top:  clampNum(bT, 0, 100 - item.height),
+  };
 }
 
 /* ====================== canvas drag (zones + furniture move) ====================== */
@@ -611,13 +759,15 @@ function enableCanvasDrag(){
     const list = drag.kind === "zone" ? state.zones : state.furniture;
     const item = list.find(x=>x.id===drag.id);
     if(!item) return;
-    let leftPct = ((e.clientX - rect.left)/rect.width)*100 - item.width/2;
-    let topPct = ((e.clientY - rect.top)/rect.height)*100 - item.height/2;
-    leftPct = clampNum(leftPct, 0, 100-item.width);
-    topPct = clampNum(topPct, 0, 100-item.height);
+    let rawLeft = ((e.clientX - rect.left)/rect.width)*100 - item.width/2;
+    let rawTop  = ((e.clientY - rect.top)/rect.height)*100 - item.height/2;
+    rawLeft = clampNum(rawLeft, 0, 100 - item.width);
+    rawTop  = clampNum(rawTop,  0, 100 - item.height);
+    const snapItems = drag.kind === "zone" ? state.zones : [...state.zones, ...state.furniture];
+    const { left: leftPct, top: topPct } = snapToEdges(item, snapItems, rawLeft, rawTop);
     drag.el.style.left = leftPct + "%";
-    drag.el.style.top = topPct + "%";
-    drag._live = { top:topPct, left:leftPct };
+    drag.el.style.top  = topPct  + "%";
+    drag._live = { top: topPct, left: leftPct };
   });
 
   const finish = (e) => {
@@ -644,6 +794,8 @@ document.addEventListener("click", (e) => {
   const id = btn.dataset.id;
 
   if(action === "set-tab"){ state.tab = btn.dataset.tab; render(); }
+
+  else if(action === "set-task-filter"){ state.taskFilter = btn.dataset.filter || null; render(); }
 
   else if(action === "delete-task"){ state.tasks = state.tasks.filter(t=>t.id!==id); saveNow(STORAGE_KEYS.tasks, state.tasks); render(); }
   else if(action === "add-task"){
@@ -681,6 +833,21 @@ document.addEventListener("click", (e) => {
   else if(action === "set-furniture-color"){
     const f = state.furniture.find(x=>x.id===id);
     if(f){ f.color = btn.dataset.color; saveNow(STORAGE_KEYS.furniture, state.furniture); render(); }
+  }
+  else if(action === "set-furniture-shape"){
+    const f = state.furniture.find(x=>x.id===id);
+    if(f){ f.shape = btn.dataset.shape; saveNow(STORAGE_KEYS.furniture, state.furniture); render(); }
+  }
+  else if(action === "rotate-furniture"){
+    const f = state.furniture.find(x=>x.id===id);
+    if(f){ f.rotate = ((f.rotate||0) + 90) % 360; saveNow(STORAGE_KEYS.furniture, state.furniture); render(); }
+  }
+  else if(action === "apply-plan-size"){
+    const w = Number(document.getElementById("plan-w").value) || 5000;
+    const h = Number(document.getElementById("plan-h").value) || 5000;
+    state.planWidth = w; state.planHeight = h;
+    saveNow(STORAGE_KEYS.planSize, {w, h});
+    render();
   }
 
   else if(action === "toggle-data-panel"){ state.dataPanelOpen = !state.dataPanelOpen; render(); }
@@ -720,6 +887,11 @@ document.addEventListener("change", (e) => {
 document.addEventListener("input", (e) => {
   const t = e.target;
   if(!t.dataset) return;
+  if(t.dataset.infoField !== undefined){
+    state.info[t.dataset.infoField] = t.value;
+    debSave(STORAGE_KEYS.info, state.info);
+    return;
+  }
   const id = t.dataset.id, field = t.dataset.field, kind = t.dataset.kind;
   if(!field || !id) return;
 
@@ -731,7 +903,8 @@ document.addEventListener("input", (e) => {
       const lbl = document.querySelector(`[data-zone-drag="${id}"] .zone-label`);
       if(lbl) lbl.textContent = t.value;
     } else {
-      z[field] = clampNum(Number(t.value)||0, 0, 100);
+      const axis = (field==='top'||field==='height') ? 'y' : 'x';
+      z[field] = clampNum(mmToPct(Number(t.value)||0, axis), 0, 100);
       const box = document.querySelector(`[data-zone-drag="${id}"]`);
       if(box) box.style[field] = z[field] + "%";
     }
@@ -746,7 +919,8 @@ document.addEventListener("input", (e) => {
       const span = document.querySelector(`[data-furniture-drag="${id}"] span`);
       if(span) span.textContent = t.value;
     } else {
-      f[field] = clampNum(Number(t.value)||0, 0, 100);
+      const axis = field === 'height' ? 'y' : 'x';
+      f[field] = clampNum(mmToPct(Number(t.value)||0, axis), 0, 100);
       const box = document.querySelector(`[data-furniture-drag="${id}"]`);
       if(box) box.style[field] = f[field] + "%";
     }
