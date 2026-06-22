@@ -228,7 +228,7 @@ const ZONE_SWATCHES = ["#EEF0F2","#E2E5E9","#E6DFD2","#E7CFC9","#DCE7DC","#F0E8D
 const DEFAULT_PLAN_LABELS = {top:"西",right:"北（入口）",bottom:"東",left:"南（バルコニー）"};
 
 /* ====================== state ====================== */
-const state = { tab:"tasks", tasks:[], budget:[], zones:[], furniture:[], info:{}, layoutEdit:false, layoutEditTab:"info", dataPanelOpen:false, loaded:false, taskFilter:null, budgetFilter:null, planWidth:5000, planHeight:5000, planLabels:{top:"西",right:"北（入口）",bottom:"東",left:"南（バルコニー）"} };
+const state = { tab:"tasks", tasks:[], budget:[], zones:[], furniture:[], info:{}, layoutEdit:false, layoutEditTab:"info", dataPanelOpen:false, loaded:false, taskFilter:null, budgetFilter:null, taskEdit:null, planWidth:5000, planHeight:5000, planLabels:{top:"西",right:"北（入口）",bottom:"東",left:"南（バルコニー）"} };
 const saveTimers = {};
 let dragId = null, dragGroup = null;
 
@@ -398,6 +398,25 @@ function renderTasks(){
                     (!t.done && !t.due) ? `<span class="chip">期限なし</span>` : "";
     const dragAttrs = !state.taskFilter ? `draggable="true" data-group="tasks" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event)" ondragend="dragEnd(event)"` : "";
     const handle = !state.taskFilter ? `<div class="drag-handle">⠿</div>` : "";
+    const isEditing = state.taskEdit === t.id;
+    if(isEditing){
+      return `
+      <div class="list-row ${t.done?'done-row':''}" data-row data-id="${t.id}" style="flex-direction:column;align-items:stretch;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          ${handle}
+          <input type="checkbox" data-action="toggle-task" data-id="${t.id}" ${t.done?'checked':''} />
+          <input class="field" style="margin:0;flex:1;" data-field="title" data-kind="task" data-id="${t.id}" value="${esc(t.title)}" />
+          <button class="del-btn" style="color:var(--accent);font-weight:700;" data-action="edit-task" data-id="${t.id}">✓</button>
+          <button class="del-btn" data-action="delete-task" data-id="${t.id}">✕</button>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:6px;padding-left:${!state.taskFilter?'44px':'22px'};">
+          <select class="num-sm" style="flex:1;" data-field="category" data-kind="task" data-id="${t.id}">
+            ${TASK_CATEGORIES.map(c=>`<option ${c===t.category?'selected':''}>${c}</option>`).join("")}
+          </select>
+          <input class="num-sm" type="date" style="flex:1;" data-field="due" data-kind="task" data-id="${t.id}" value="${t.due||''}" />
+        </div>
+      </div>`;
+    }
     return `
       <div class="list-row ${t.done?'done-row':''}" data-row data-id="${t.id}" ${dragAttrs}>
         ${handle}
@@ -409,6 +428,7 @@ function renderTasks(){
             ${dueChip}
           </div>
         </div>
+        <button class="del-btn" data-action="edit-task" data-id="${t.id}" title="編集">✏</button>
         <button class="del-btn" data-action="delete-task" data-id="${t.id}">✕</button>
       </div>`;
   }).join("");
@@ -869,6 +889,7 @@ document.addEventListener("click", (e) => {
   else if(action === "set-task-filter"){ state.taskFilter = btn.dataset.filter || null; render(); }
   else if(action === "set-budget-filter"){ state.budgetFilter = btn.dataset.filter || null; render(); }
 
+  else if(action === "edit-task"){ state.taskEdit = state.taskEdit === id ? null : id; render(); }
   else if(action === "delete-task"){ state.tasks = state.tasks.filter(t=>t.id!==id); saveNow(STORAGE_KEYS.tasks, state.tasks); render(); }
   else if(action === "add-task"){
     const titleEl = document.getElementById("new-task-title");
@@ -959,6 +980,16 @@ document.addEventListener("change", (e) => {
     if(task){ task.done = t.checked; saveNow(STORAGE_KEYS.tasks, state.tasks); render(); }
     return;
   }
+  if(t.dataset && t.dataset.kind === "task" && t.dataset.field && t.dataset.id){
+    const task = state.tasks.find(x=>x.id===t.dataset.id);
+    if(task){
+      if(t.dataset.field === "category") task.category = t.value;
+      else if(t.dataset.field === "due") task.due = t.value || null;
+      saveNow(STORAGE_KEYS.tasks, state.tasks);
+      render();
+    }
+    return;
+  }
   if(t.dataset && t.dataset.field && t.dataset.id && !t.dataset.kind){
     // budget field changes (status select triggers 'change'; number/text use 'input' below but also fires change)
     const b = state.budget.find(x=>x.id===t.dataset.id);
@@ -989,6 +1020,12 @@ document.addEventListener("input", (e) => {
   }
   const id = t.dataset.id, field = t.dataset.field, kind = t.dataset.kind;
   if(!field || !id) return;
+
+  if(kind === "task"){
+    const task = state.tasks.find(x=>x.id===id);
+    if(task && field === "title"){ task.title = t.value; debSave(STORAGE_KEYS.tasks, state.tasks); }
+    return;
+  }
 
   if(kind === "zone"){
     const z = state.zones.find(x=>x.id===id);
