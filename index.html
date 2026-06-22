@@ -82,11 +82,12 @@
   .layout-note{ display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:5px; }
   .edit-toggle{ font-size:11px; padding:4px 8px; border-radius:7px; border:none; cursor:pointer; font-weight:600; white-space:nowrap; }
   .fp-sticky{ position:sticky; top:0; z-index:50; background:var(--base); padding-bottom:6px; }
-  .fp-wrap{ display:flex; align-items:stretch; gap:3px; }
-  .fp-side-label{ font-size:9px; color:var(--text-soft); display:flex; align-items:center; writing-mode:vertical-rl; line-height:1.2; padding:2px 0; }
-  .fp-side-label.fp-left{ transform:rotate(180deg); }
-  .fp-mid{ flex:1; min-width:0; }
+  .fp-wrap{ display:flex; flex-direction:column; }
+  .fp-mid{ width:100%; }
   .fp-edge-label{ display:block; text-align:center; font-size:9px; color:var(--text-soft); padding:2px 0; }
+  .fp-inner-label{ position:absolute; font-size:9px; color:var(--text-soft); pointer-events:none; z-index:20; writing-mode:vertical-rl; top:50%; transform:translateY(-50%); }
+  .fp-inner-left{ left:3px; }
+  .fp-inner-right{ right:3px; }
   .floor-plan{ position:relative; width:100%; padding-top:100%; border:1px solid var(--line); border-radius:10px; background:var(--base); overflow:hidden; touch-action:none; user-select:none; }
   .zone-box, .furniture-box{ position:absolute; }
   .zone-box{ display:flex; align-items:center; justify-content:center; padding:3px; border:1px solid var(--line); }
@@ -667,16 +668,16 @@ function renderLayout(){
       <button class="edit-toggle" style="${editBtnStyle}" data-action="toggle-edit">${state.layoutEdit?'編集を終える':'間取りを編集'}</button>
     </div>
     <div class="fp-wrap">
-      <span class="fp-side-label fp-left" data-edge="left">${esc(state.planLabels.left)}</span>
       <div class="fp-mid">
         <span class="fp-edge-label" data-edge="top">${esc(state.planLabels.top)}</span>
         <div class="floor-plan" id="floor-plan">
           ${zoneBoxes}
           ${furnitureBoxes}
+          <span class="fp-inner-label fp-inner-left" data-edge="left">${esc(state.planLabels.left)}</span>
+          <span class="fp-inner-label fp-inner-right" data-edge="right">${esc(state.planLabels.right)}</span>
         </div>
         <span class="fp-edge-label" data-edge="bottom">${esc(state.planLabels.bottom)}</span>
       </div>
-      <span class="fp-side-label" data-edge="right">${esc(state.planLabels.right)}</span>
     </div>`;
 
   return state.layoutEdit
